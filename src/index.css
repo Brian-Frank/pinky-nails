@@ -1,0 +1,32 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap');
+
+:root {
+  --cp:    #C2185B;
+  --cp-h:  #AD1457;
+  --cp-d:  #880E4F;
+  --cp-r:  #FCE4EC;
+  --cp-50: #FFF0F5;
+  --ink:   #2D1B2E;
+  --text:  #8D6E8F;
+  --text-lt:#C4A4C6;
+  --bg:    #FFF8F0;
+  --card:  #FFFFFF;
+  --border:#F0D8F0;
+  --div:   #F5E6F5;
+  --blush: #F8BBD9;
+  --font:  'Montserrat', sans-serif;
+  --sh:    0 2px 16px rgba(194,24,91,.07);
+  --sh-lg: 0 8px 40px rgba(194,24,91,.14);
+  --sh-btn:0 4px 20px rgba(194,24,91,.28);
+  --r:18px; --r-sm:12px; --r-pill:999px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;font-family:var(--font);-webkit-font-smoothing:antialiased}
+body{background:var(--bg);color:var(--ink);overflow-x:hidden}
+img{display:block;max-width:100%}
+a{text-decoration:none;color:inherit}
+button,input,textarea,select{font-family:var(--font)}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-thumb{background:var(--blush);border-radius:99px}
+.fade-up{opacity:0;transform:translateY(24px);transition:opacity .6s ease,transform .6s ease}
+.fade-up.visible{opacity:1;transform:translateY(0)}
