@@ -75,7 +75,7 @@ function Login({ onLogin }) {
     const email = import.meta.env.VITE_ADMIN_EMAIL
     const { error } = await supabase.auth.signInWithPassword({ email, password: pass })
     setBusy(false)
-    if (error) { setErr('Contraseña incorrecta.'); return }
+    if (error) { setErr(error.message); return }
     onLogin()
   }
 
