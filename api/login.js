@@ -1,7 +1,7 @@
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end()
 
-  // parse body manually
+  // parse body manually (Vercel doesn't auto-parse outside Next.js)
   let body = {}
   try {
     let raw = ''
@@ -12,25 +12,9 @@ export default async function handler(req, res) {
   }
 
   const { username, password } = body
-
-  const expectedUser = process.env.ADMIN_USER   ?? ''
-  const expectedPass = process.env.ADMIN_PASS   ?? ''
-  const secret       = process.env.ADMIN_SECRET ?? ''
-
-  // temporary debug — remove after confirming login works
-  if (username === 'debug') {
-    return res.status(200).json({
-      userLen:   expectedUser.length,
-      passLen:   expectedPass.length,
-      secretLen: secret.length,
-      userMatch: username === expectedUser,
-      passMatch: password === expectedPass,
-    })
-  }
-
-  const ok = username === expectedUser && password === expectedPass
+  const ok = username === process.env.ADMIN_USER && password === process.env.ADMIN_PASS
 
   if (!ok) return res.status(401).json({ error: 'Credenciales incorrectas' })
 
-  return res.status(200).json({ token: secret })
+  return res.status(200).json({ token: process.env.ADMIN_SECRET })
 }

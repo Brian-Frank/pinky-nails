@@ -717,7 +717,7 @@ export default function AdminPanel() {
   }
 
   if (checking) return <Spinner />
-  if (!session)  return <Login onLogin={() => {}} />
+  if (!session)  return <Login onLogin={() => setSession(true)} />
 
   const tabContent = {
     hero:       <HeroEditor />,
