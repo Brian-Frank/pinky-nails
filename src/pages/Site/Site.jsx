@@ -98,9 +98,9 @@ function Lightbox({ items, startIdx, onClose }) {
 /* ══════════════════════════════════════════════════
    NAVBAR
 ══════════════════════════════════════════════════ */
-function Navbar({ studioName, whatsapp, instagram }) {
-  const [scrolled, setScrolled] = useState(false)
-  const [menuOpen, setMenuOpen] = useState(false)
+function Navbar({ studioName, whatsapp }) {
+  const [scrolled,  setScrolled]  = useState(false)
+  const [menuOpen,  setMenuOpen]  = useState(false)
   const wa = whatsapp || '5491100000000'
 
   useEffect(() => {
@@ -109,47 +109,173 @@ function Navbar({ studioName, whatsapp, instagram }) {
     return () => window.removeEventListener('scroll', fn)
   }, [])
 
-  const navStyle = {
-    position:'fixed',top:0,left:0,right:0,zIndex:100,
-    display:'flex',alignItems:'center',justifyContent:'space-between',
-    padding:'0 clamp(16px,5vw,64px)',height:68,
-    background:'rgba(255,248,240,0.92)',backdropFilter:'blur(18px)',
-    borderBottom:'1px solid var(--border)',
-    transition:'box-shadow .3s',
-    boxShadow: scrolled ? 'var(--sh)' : 'none',
-  }
-  const links = ['servicios','sobre-mi','galeria','precios','contacto']
+  // close menu on scroll
+  useEffect(() => {
+    if (!menuOpen) return
+    const fn = () => setMenuOpen(false)
+    window.addEventListener('scroll', fn, { passive:true })
+    return () => window.removeEventListener('scroll', fn)
+  }, [menuOpen])
+
+  const links  = ['servicios','sobre-mi','galeria','precios','contacto']
   const labels = ['Servicios','Sobre mí','Galería','Precios','Contacto']
+  const emojis = ['💅','🌸','📸','💰','📞']
 
   return (
     <>
-      <nav style={navStyle}>
-        <a href="#inicio" style={{display:'flex',alignItems:'center',gap:10,fontSize:17,fontWeight:900,color:'var(--cp)',letterSpacing:'-.3px'}}>
-          <div style={{width:38,height:38,borderRadius:12,background:'linear-gradient(135deg,var(--cp),var(--cp-d))',display:'flex',alignItems:'center',justifyContent:'center',fontSize:18,boxShadow:'0 3px 10px rgba(194,24,91,.3)'}}>💅</div>
-          {studioName || 'Pinky Nail Studio'}
+      <style>{`
+        .nav-root {
+          position:fixed;top:0;left:0;right:0;z-index:100;
+          display:flex;align-items:center;justify-content:space-between;
+          padding:0 clamp(16px,5vw,64px);height:68px;
+          background:rgba(255,248,240,0.92);
+          backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+          border-bottom:1px solid var(--border);
+          transition:box-shadow .3s;
+        }
+        .nav-logo {
+          display:flex;align-items:center;gap:10px;
+          font-size:17px;font-weight:900;color:var(--cp);
+          letter-spacing:-.3px;text-decoration:none;flex-shrink:0;
+        }
+        .nav-logo-img {
+          width:38px;height:38px;border-radius:50%;
+          object-fit:cover;border:2px solid var(--blush);
+          box-shadow:0 3px 10px rgba(194,24,91,.25);
+          flex-shrink:0;
+        }
+        .nav-logo-name { font-size:15px; }
+        .nav-links {
+          display:flex;gap:28px;list-style:none;
+        }
+        .nav-links a {
+          font-size:13px;font-weight:600;color:var(--text);
+          text-decoration:none;transition:color .2s;
+        }
+        .nav-links a:hover { color:var(--cp); }
+        .nav-cta {
+          display:inline-flex;align-items:center;gap:7px;
+          padding:0 20px;height:42px;border-radius:var(--r-pill);
+          background:linear-gradient(135deg,var(--cp),var(--cp-d));
+          color:#fff;font-size:13px;font-weight:700;
+          text-decoration:none;border:none;cursor:pointer;
+          box-shadow:var(--sh-btn);transition:opacity .15s,transform .1s;
+          font-family:var(--font);
+        }
+        .nav-cta:hover { opacity:.9;transform:translateY(-1px); }
+
+        /* hamburger */
+        .nav-hamburger {
+          display:none;flex-direction:column;justify-content:center;
+          gap:5px;background:none;border:none;cursor:pointer;
+          padding:8px;border-radius:10px;transition:background .2s;
+          flex-shrink:0;
+        }
+        .nav-hamburger:hover { background:var(--cp-r); }
+        .nav-hamburger span {
+          display:block;width:22px;height:2.5px;
+          background:var(--cp);border-radius:99px;
+          transition:transform .3s, opacity .3s;
+          transform-origin:center;
+        }
+        .nav-hamburger.open span:nth-child(1) { transform:translateY(7.5px) rotate(45deg); }
+        .nav-hamburger.open span:nth-child(2) { opacity:0;transform:scaleX(0); }
+        .nav-hamburger.open span:nth-child(3) { transform:translateY(-7.5px) rotate(-45deg); }
+
+        /* mobile drawer */
+        .nav-drawer {
+          position:fixed;top:68px;left:0;right:0;
+          background:rgba(255,248,240,.98);
+          backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+          border-bottom:1px solid var(--border);
+          z-index:99;
+          transform:translateY(-8px);opacity:0;pointer-events:none;
+          transition:transform .25s ease,opacity .25s ease;
+        }
+        .nav-drawer.open {
+          transform:translateY(0);opacity:1;pointer-events:auto;
+        }
+        .nav-drawer-inner {
+          padding:16px 24px 24px;
+          display:flex;flex-direction:column;
+        }
+        .nav-drawer-link {
+          display:flex;align-items:center;gap:14px;
+          padding:14px 4px;
+          font-size:16px;font-weight:700;color:var(--ink);
+          text-decoration:none;
+          border-bottom:1px solid var(--div);
+          transition:color .15s,padding-left .15s;
+        }
+        .nav-drawer-link:last-of-type { border-bottom:none; }
+        .nav-drawer-link:hover { color:var(--cp);padding-left:8px; }
+        .nav-drawer-link span.icon {
+          width:36px;height:36px;border-radius:10px;
+          background:var(--cp-r);display:flex;align-items:center;
+          justify-content:center;font-size:16px;flex-shrink:0;
+        }
+        .nav-drawer-cta {
+          margin-top:16px;
+          display:flex;align-items:center;justify-content:center;gap:8px;
+          padding:14px;border-radius:var(--r-pill);
+          background:linear-gradient(135deg,var(--cp),var(--cp-d));
+          color:#fff;font-size:15px;font-weight:700;
+          text-decoration:none;box-shadow:var(--sh-btn);
+          font-family:var(--font);
+        }
+
+        @media(max-width:768px){
+          .nav-links  { display:none !important; }
+          .nav-cta    { display:none !important; }
+          .nav-hamburger { display:flex !important; }
+        }
+      `}</style>
+
+      <nav className="nav-root" style={{boxShadow: scrolled ? 'var(--sh)' : 'none'}}>
+        {/* Logo */}
+        <a href="#inicio" className="nav-logo">
+          <img src="/logo.png" alt="Pinky" className="nav-logo-img" />
+          <span className="nav-logo-name">{studioName || 'Pinky Nail Studio'}</span>
         </a>
-        <ul style={{display:'flex',gap:28,listStyle:'none'}} className="desktop-links">
-          {links.map((l,i) => <li key={l}><a href={`#${l}`} style={{fontSize:13,fontWeight:600,color:'var(--text)',transition:'color .2s'}} onMouseEnter={e=>e.target.style.color='var(--cp)'} onMouseLeave={e=>e.target.style.color='var(--text)'}>{labels[i]}</a></li>)}
+
+        {/* Desktop links */}
+        <ul className="nav-links">
+          {links.map((l,i) => <li key={l}><a href={`#${l}`}>{labels[i]}</a></li>)}
         </ul>
-        <a href={`https://wa.me/${wa}?text=Hola!%20Quiero%20reservar%20un%20turno%20%F0%9F%98%8A`} target="_blank" rel="noreferrer"
-          style={{...btnPrimary,height:42,padding:'0 20px',fontSize:13}} className="desktop-links">
+
+        {/* Desktop CTA */}
+        <a href={`https://wa.me/${wa}?text=Hola!%20Quiero%20reservar%20un%20turno%20%F0%9F%98%8A`}
+          target="_blank" rel="noreferrer" className="nav-cta">
           💬 Reservar turno
         </a>
-        <button onClick={()=>setMenuOpen(o=>!o)} style={{display:'none',background:'none',border:'none',cursor:'pointer',padding:4}} className="hamburger">
-          <span style={{display:'block',width:22,height:2,background:'var(--cp)',borderRadius:2,margin:'5px 0',transition:'.3s'}} />
-          <span style={{display:'block',width:22,height:2,background:'var(--cp)',borderRadius:2,margin:'5px 0',transition:'.3s'}} />
-          <span style={{display:'block',width:22,height:2,background:'var(--cp)',borderRadius:2,margin:'5px 0',transition:'.3s'}} />
+
+        {/* Hamburger */}
+        <button
+          className={`nav-hamburger ${menuOpen ? 'open' : ''}`}
+          onClick={() => setMenuOpen(o => !o)}
+          aria-label="Menú"
+        >
+          <span /><span /><span />
         </button>
       </nav>
 
-      {/* Mobile menu */}
-      {menuOpen && (
-        <div style={{position:'fixed',inset:'68px 0 0',background:'rgba(255,248,240,.97)',backdropFilter:'blur(20px)',zIndex:99,display:'flex',flexDirection:'column',padding:'32px 24px',gap:12,borderTop:'1px solid var(--border)'}}>
-          {links.map((l,i)=><a key={l} href={`#${l}`} onClick={()=>setMenuOpen(false)} style={{fontSize:17,fontWeight:700,color:'var(--ink)',padding:'14px 0',borderBottom:'1px solid var(--div)'}}>{labels[i]}</a>)}
-          <a href={`https://wa.me/${wa}`} target="_blank" rel="noreferrer" style={{...btnPrimary,marginTop:16,justifyContent:'center'}}>💬 Reservar turno</a>
+      {/* Mobile drawer */}
+      <div className={`nav-drawer ${menuOpen ? 'open' : ''}`}>
+        <div className="nav-drawer-inner">
+          {links.map((l,i) => (
+            <a key={l} href={`#${l}`} className="nav-drawer-link"
+              onClick={() => setMenuOpen(false)}>
+              <span className="icon">{emojis[i]}</span>
+              {labels[i]}
+            </a>
+          ))}
+          <a href={`https://wa.me/${wa}?text=Hola!%20Quiero%20reservar%20un%20turno%20%F0%9F%98%8A`}
+            target="_blank" rel="noreferrer" className="nav-drawer-cta"
+            onClick={() => setMenuOpen(false)}>
+            💬 Reservar turno
+          </a>
         </div>
-      )}
-      <style>{`@media(max-width:768px){.desktop-links{display:none!important}.hamburger{display:flex!important}}`}</style>
+      </div>
     </>
   )
 }
@@ -523,12 +649,19 @@ export default function Site() {
   const { content, loading } = useContent()
 
   if (loading) return (
-    <div style={{minHeight:'100dvh',display:'flex',alignItems:'center',justifyContent:'center',background:'var(--cp-50)'}}>
-      <div style={{textAlign:'center'}}>
-        <div style={{fontSize:52,marginBottom:16,animation:'spin 2s linear infinite'}}>💅</div>
-        <p style={{fontSize:14,fontWeight:700,color:'var(--cp)'}}>Cargando...</p>
+    <div style={{minHeight:'100dvh',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',background:'linear-gradient(145deg,var(--cp-50),#fff,var(--cp-r))'}}>
+      <style>{`
+        @keyframes ld-pulse { 0%,100%{transform:scale(1);opacity:1} 50%{transform:scale(1.08);opacity:.85} }
+        @keyframes ld-bar   { 0%{width:0%} 100%{width:100%} }
+        @keyframes ld-dot   { 0%,80%,100%{transform:scale(0)} 40%{transform:scale(1)} }
+      `}</style>
+      <div style={{width:96,height:96,borderRadius:'50%',overflow:'hidden',boxShadow:'0 8px 32px rgba(194,24,91,.25)',marginBottom:24,animation:'ld-pulse 2s ease-in-out infinite',border:'3px solid var(--blush)'}}>
+        <img src="/logo.png" alt="Pinky" style={{width:'100%',height:'100%',objectFit:'cover'}} />
       </div>
-      <style>{`@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}`}</style>
+      <p style={{fontSize:13,fontWeight:700,color:'var(--cp)',letterSpacing:'.08em',textTransform:'uppercase',marginBottom:20}}>Pinky Nail Studio</p>
+      <div style={{width:160,height:3,background:'var(--cp-r)',borderRadius:99,overflow:'hidden'}}>
+        <div style={{height:'100%',background:'linear-gradient(90deg,var(--cp),var(--cp-d))',borderRadius:99,animation:'ld-bar 1.4s ease-in-out infinite'}} />
+      </div>
     </div>
   )
 
