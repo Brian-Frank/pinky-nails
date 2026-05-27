@@ -1,5 +1,4 @@
 import { createContext, useContext, useEffect, useState, useCallback } from 'react'
-import { supabase } from '../lib/supabase'
 
 /* ── Default content (used when DB is empty) ───────────────── */
 export const DEFAULT_CONTENT = {
@@ -109,21 +108,19 @@ export function ContentProvider({ children }) {
   const [content, setContent] = useState(DEFAULT_CONTENT)
   const [loading, setLoading] = useState(true)
 
-  /* fetch all sections from DB (skipped if Supabase not configured) */
+  /* fetch all sections via API */
   useEffect(() => {
-    if (!supabase) { setLoading(false); return }
-    ;(async () => {
-      const { data, error } = await supabase
-        .from('pinky_content')
-        .select('section, data')
-      if (error) { console.error(error); setLoading(false); return }
-      if (data && data.length > 0) {
-        const merged = { ...DEFAULT_CONTENT }
-        data.forEach(row => { if (merged[row.section] !== undefined) merged[row.section] = row.data })
-        setContent(merged)
-      }
-      setLoading(false)
-    })()
+    fetch('/api/get-content')
+      .then(r => r.ok ? r.json() : Promise.reject(r))
+      .then(({ data }) => {
+        if (data && data.length > 0) {
+          const merged = { ...DEFAULT_CONTENT }
+          data.forEach(row => { if (merged[row.section] !== undefined) merged[row.section] = row.data })
+          setContent(merged)
+        }
+      })
+      .catch(err => console.error('Error cargando contenido:', err))
+      .finally(() => setLoading(false))
   }, [])
 
   /* apply theme CSS variables */
@@ -136,14 +133,23 @@ export function ContentProvider({ children }) {
     if (t.softColor)    r.setProperty('--cp-r', t.softColor)
   }, [content.theme])
 
-  /** Save one section (no-op if Supabase not configured) */
+  /** Save one section via /api/save-section (requiere token admin) */
   const updateSection = useCallback(async (section, data) => {
     setContent(prev => ({ ...prev, [section]: data }))
-    if (!supabase) return
-    const { error } = await supabase
-      .from('pinky_content')
-      .upsert({ section, data, updated_at: new Date().toISOString() })
-    if (error) throw error
+    const token = sessionStorage.getItem('pinky-admin-token')
+    if (!token) return
+    const res = await fetch('/api/save-section', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({ section, data }),
+    })
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}))
+      throw new Error(err.error || 'Error al guardar')
+    }
   }, [])
 
   return (
