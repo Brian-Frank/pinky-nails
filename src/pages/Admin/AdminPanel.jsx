@@ -62,15 +62,21 @@ function Login({ onLogin }) {
   async function submit(e) {
     e.preventDefault()
     setErr('')
-    if (!supabase) {
-      setErr('Admin panel requires Supabase. Add environment variables first.')
-      return
-    }
     setBusy(true)
-    const { error } = await supabase.auth.signInWithPassword({ email: user.trim(), password: pass })
+    try {
+      const res = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: user.trim(), password: pass }),
+      })
+      const data = await res.json()
+      if (!res.ok) { setErr(data.error || 'Credenciales incorrectas'); setBusy(false); return }
+      sessionStorage.setItem('pinky-admin-token', data.token)
+      onLogin()
+    } catch {
+      setErr('Error de conexión. Intentá de nuevo.')
+    }
     setBusy(false)
-    if (error) { setErr(error.message); return }
-    onLogin()
   }
 
   return (
@@ -694,19 +700,20 @@ export default function AdminPanel() {
   const [activeTab, setActiveTab] = useState('hero')
   const [menuOpen, setMenuOpen] = useState(false)
 
-  /* Check existing session */
+  /* Check existing session via /api/verify */
   useEffect(() => {
-    if (!supabase) { setChecking(false); return }
-    supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session)
-      setChecking(false)
-    })
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, s) => setSession(s))
-    return () => subscription.unsubscribe()
+    const token = sessionStorage.getItem('pinky-admin-token')
+    if (!token) { setChecking(false); return }
+    fetch('/api/verify', { headers: { Authorization: `Bearer ${token}` } })
+      .then(r => r.json())
+      .then(d => { if (d.ok) setSession(true) })
+      .catch(() => {})
+      .finally(() => setChecking(false))
   }, [])
 
-  async function logout() {
-    if (supabase) await supabase.auth.signOut()
+  function logout() {
+    sessionStorage.removeItem('pinky-admin-token')
+    setSession(null)
   }
 
   if (checking) return <Spinner />
