@@ -66,14 +66,8 @@ function Login({ onLogin }) {
       setErr('Admin panel requires Supabase. Add environment variables first.')
       return
     }
-    const expectedUser = import.meta.env.VITE_ADMIN_USERNAME || 'felicitas'
-    if (user.trim().toLowerCase() !== expectedUser.toLowerCase()) {
-      setErr('Usuario incorrecto.')
-      return
-    }
     setBusy(true)
-    const email = import.meta.env.VITE_ADMIN_EMAIL
-    const { error } = await supabase.auth.signInWithPassword({ email, password: pass })
+    const { error } = await supabase.auth.signInWithPassword({ email: user.trim(), password: pass })
     setBusy(false)
     if (error) { setErr(error.message); return }
     onLogin()
