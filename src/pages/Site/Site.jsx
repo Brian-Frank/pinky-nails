@@ -364,55 +364,111 @@ function ServiceCard({ s }) {
   )
 }
 
+/* ── Photo carousel for About section ── */
+function PhotoCarousel({ photos }) {
+  const [idx, setIdx] = useState(0)
+  const total = photos.length
+
+  function go(next) { setIdx((next + total) % total) }
+
+  useEffect(() => {
+    if (total <= 1) return
+    const t = setInterval(() => setIdx(i => (i + 1) % total), 3800)
+    return () => clearInterval(t)
+  }, [total])
+
+  if (!total) return <div style={{width:'100%',height:'100%',borderRadius:28,background:'var(--cp-r)'}} />
+
+  return (
+    <div style={{position:'relative',width:'100%',height:'100%',borderRadius:28,overflow:'hidden',boxShadow:'var(--sh-lg)'}}>
+      <style>{`
+        @keyframes ab-fade-in{from{opacity:0;transform:scale(1.05)}to{opacity:1;transform:scale(1)}}
+        .ab-photo{animation:ab-fade-in .5s ease forwards}
+      `}</style>
+      <img key={idx} src={photos[idx]} alt={`foto ${idx+1}`}
+        className="ab-photo"
+        style={{width:'100%',height:'100%',objectFit:'cover',display:'block'}} />
+
+      {/* bottom gradient */}
+      <div style={{position:'absolute',bottom:0,left:0,right:0,height:'45%',
+        background:'linear-gradient(to top,rgba(0,0,0,.55),transparent)',pointerEvents:'none'}} />
+
+      {/* arrows */}
+      {total > 1 && <>
+        <button onClick={()=>go(idx-1)} style={{position:'absolute',left:12,top:'50%',transform:'translateY(-50%)',
+          width:38,height:38,borderRadius:'50%',background:'rgba(255,255,255,.2)',backdropFilter:'blur(8px)',
+          border:'1.5px solid rgba(255,255,255,.35)',color:'#fff',fontSize:20,cursor:'pointer',
+          display:'flex',alignItems:'center',justifyContent:'center',zIndex:2,lineHeight:1}}>‹</button>
+        <button onClick={()=>go(idx+1)} style={{position:'absolute',right:12,top:'50%',transform:'translateY(-50%)',
+          width:38,height:38,borderRadius:'50%',background:'rgba(255,255,255,.2)',backdropFilter:'blur(8px)',
+          border:'1.5px solid rgba(255,255,255,.35)',color:'#fff',fontSize:20,cursor:'pointer',
+          display:'flex',alignItems:'center',justifyContent:'center',zIndex:2,lineHeight:1}}>›</button>
+      </>}
+
+      {/* dots */}
+      {total > 1 && (
+        <div style={{position:'absolute',bottom:14,left:'50%',transform:'translateX(-50%)',
+          display:'flex',gap:6,zIndex:2}}>
+          {photos.map((_,i)=>(
+            <button key={i} onClick={()=>go(i)}
+              style={{width:i===idx?22:7,height:7,borderRadius:99,padding:0,border:'none',cursor:'pointer',
+                background:i===idx?'#fff':'rgba(255,255,255,.45)',transition:'all .3s ease'}} />
+          ))}
+        </div>
+      )}
+
+      {/* counter */}
+      <div style={{position:'absolute',top:14,right:14,
+        background:'rgba(0,0,0,.3)',backdropFilter:'blur(6px)',
+        color:'#fff',fontSize:11,fontWeight:700,padding:'4px 10px',borderRadius:99,zIndex:2}}>
+        {idx+1} / {total}
+      </div>
+    </div>
+  )
+}
+
 /* ══════════════════════════════════════════════════
    SOBRE MÍ
 ══════════════════════════════════════════════════ */
 function About({ data, instagram }) {
   const ref1 = useFadeUp(), ref2 = useFadeUp()
-  const ig = (instagram||'').replace('@','')
+  const ig     = (instagram||'').replace('@','')
   const photos = data.photos || []
+
   return (
     <section id="sobre-mi" style={{background:'var(--bg)',padding:'clamp(60px,8vw,100px) clamp(16px,6vw,80px)'}}>
       <div style={{maxWidth:1200,margin:'0 auto'}}>
         <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:72,alignItems:'center'}} className="about-inner">
+
+          {/* carrusel */}
           <div ref={ref1} className="fade-up" style={{position:'relative',height:520}}>
-            <div style={{position:'absolute',top:0,left:0,width:'78%',aspectRatio:1,borderRadius:28,overflow:'hidden',boxShadow:'var(--sh-lg)'}}>
-              <img src={photos[0]||''} alt="About" style={{width:'100%',height:'100%',objectFit:'cover'}} />
-            </div>
-            {photos[1] && (
-              <div style={{position:'absolute',bottom:0,right:0,width:'56%',aspectRatio:1,borderRadius:22,overflow:'hidden',boxShadow:'var(--sh-lg)',border:'4px solid var(--bg)'}}>
-                <img src={photos[1]} alt="About 2" style={{width:'100%',height:'100%',objectFit:'cover'}} />
-              </div>
-            )}
-            <div style={{position:'absolute',top:'42%',left:'60%',background:'linear-gradient(135deg,var(--cp),var(--cp-d))',color:'#fff',borderRadius:16,padding:'14px 18px',boxShadow:'var(--sh-btn)',textAlign:'center',zIndex:2}}>
+            <PhotoCarousel photos={photos} />
+            <div style={{position:'absolute',top:20,left:-16,zIndex:3,
+              background:'linear-gradient(135deg,var(--cp),var(--cp-d))',
+              color:'#fff',borderRadius:16,padding:'14px 18px',
+              boxShadow:'var(--sh-btn)',textAlign:'center'}}>
               <div style={{fontSize:28,lineHeight:1}}>💜</div>
               <div style={{fontSize:10,opacity:.85,textTransform:'uppercase',letterSpacing:'.4px'}}>Hecho con amor</div>
             </div>
           </div>
+
+          {/* texto */}
           <div ref={ref2} className="fade-up">
             <div style={{display:'inline-flex',padding:'6px 16px',borderRadius:'var(--r-pill)',background:'var(--cp-r)',color:'var(--cp)',fontSize:11,fontWeight:700,textTransform:'uppercase',letterSpacing:'.5px',marginBottom:16}}>🌸 Sobre el estudio</div>
-            <h2 style={{fontSize:'clamp(26px,3.5vw,44px)',fontWeight:900,letterSpacing:'-1px',color:'var(--ink)',lineHeight:1.1,marginBottom:20}}>{data.title}<br/><span style={{color:'var(--cp)'}}>{data.accent}</span></h2>
+            <h2 style={{fontSize:'clamp(26px,3.5vw,44px)',fontWeight:900,letterSpacing:'-1px',color:'var(--ink)',lineHeight:1.1,marginBottom:20}}>
+              {data.title}<br/><span style={{color:'var(--cp)'}}>{data.accent}</span>
+            </h2>
             <p style={{fontSize:15,color:'var(--text)',lineHeight:1.8,marginBottom:16}}>{data.p1}</p>
             <p style={{fontSize:15,color:'var(--text)',lineHeight:1.8,marginBottom:16}}>{data.p2}</p>
             <p style={{fontSize:15,color:'var(--text)',lineHeight:1.8,marginBottom:28}}>{data.p3}</p>
             <div style={{display:'flex',flexWrap:'wrap',gap:10,marginBottom:36}}>
               {(data.pills||[]).map((p,i)=><span key={i} style={{padding:'8px 18px',borderRadius:'var(--r-pill)',background:'var(--cp-r)',color:'var(--cp)',fontSize:12,fontWeight:700}}>{p}</span>)}
             </div>
-            {/* Extra photos */}
-            {photos.length > 2 && (
-              <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(100px,1fr))',gap:10,marginBottom:28}}>
-                {photos.slice(2).map((src,i)=>(
-                  <div key={i} style={{aspectRatio:1,borderRadius:14,overflow:'hidden',boxShadow:'var(--sh)'}}>
-                    <img src={src} alt="" style={{width:'100%',height:'100%',objectFit:'cover'}} />
-                  </div>
-                ))}
-              </div>
-            )}
             <a href={`https://www.instagram.com/${ig}/`} target="_blank" rel="noreferrer" style={btnPrimary}>Ver en Instagram →</a>
           </div>
         </div>
       </div>
-      <style>{`@media(max-width:900px){.about-inner{grid-template-columns:1fr!important;gap:40px!important}.about-inner>div:first-child{height:320px!important}}`}</style>
+      <style>{`@media(max-width:900px){.about-inner{grid-template-columns:1fr!important;gap:40px!important}.about-inner>div:first-child{height:360px!important}}`}</style>
     </section>
   )
 }
