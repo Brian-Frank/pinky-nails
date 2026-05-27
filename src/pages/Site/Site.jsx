@@ -625,19 +625,6 @@ function Contact({ data }) {
                 </div>
               </div>
             ))}
-            <div style={{display:'flex',gap:12,marginTop:32}}>
-              {[
-                {href:`https://www.instagram.com/${ig}/`,icon:'📸'},
-                {href:`https://wa.me/${wa}`,icon:'💬'},
-              ].map(s=>(
-                <a key={s.icon} href={s.href} target="_blank" rel="noreferrer"
-                  style={{width:48,height:48,borderRadius:14,background:'var(--card)',boxShadow:'var(--sh)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:22,transition:'transform .2s,box-shadow .2s',border:'1.5px solid var(--border)'}}
-                  onMouseEnter={e=>{e.currentTarget.style.transform='translateY(-3px)';e.currentTarget.style.boxShadow='var(--sh-lg)'}}
-                  onMouseLeave={e=>{e.currentTarget.style.transform='none';e.currentTarget.style.boxShadow='var(--sh)'}}>
-                  {s.icon}
-                </a>
-              ))}
-            </div>
           </div>
           <div ref={ref2} className="fade-up" style={{background:'var(--card)',borderRadius:28,padding:'40px 36px',boxShadow:'var(--sh-lg)',border:'1.5px solid var(--border)',textAlign:'center'}}>
             <div style={{fontSize:52,marginBottom:8}}>💅</div>
