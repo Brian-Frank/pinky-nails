@@ -4,8 +4,9 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end()
 
   // verify admin token
-  const token = (req.headers.authorization ?? '').replace('Bearer ', '').trim()
-  if (!token || token !== process.env.ADMIN_SECRET) {
+  const token  = (req.headers.authorization ?? '').replace('Bearer ', '').trim()
+  const secret = (process.env.ADMIN_SECRET ?? '').trim()
+  if (!token || token !== secret) {
     return res.status(401).json({ error: 'No autorizado' })
   }
 
