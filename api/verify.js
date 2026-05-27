@@ -1,7 +1,9 @@
 export default function handler(req, res) {
-  const token = req.headers.authorization?.replace('Bearer ', '')
+  const auth  = req.headers['authorization'] ?? ''
+  const token = auth.replace('Bearer ', '').trim()
+  const secret = process.env.ADMIN_SECRET
 
-  if (token && token === process.env.ADMIN_SECRET) {
+  if (secret && token === secret) {
     return res.status(200).json({ ok: true })
   }
 
