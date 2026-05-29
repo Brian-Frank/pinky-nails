@@ -5,7 +5,7 @@ import { useContent } from '../../context/ContentContext'
 const btnPrimary = {
   display:'inline-flex',alignItems:'center',justifyContent:'center',gap:'8px',
   padding:'13px 28px',borderRadius:'var(--r-pill)',border:'none',cursor:'pointer',
-  background:'linear-gradient(135deg,var(--cp) 0%,var(--cp-d) 100%)',
+  background:'var(--cp)',
   color:'#fff',fontSize:'14px',fontWeight:700,
   boxShadow:'var(--sh-btn)',transition:'opacity .15s,transform .1s',
   fontFamily:'var(--font)',textDecoration:'none',
@@ -156,7 +156,7 @@ function Navbar({ studioName, whatsapp }) {
         .nav-cta {
           display:inline-flex;align-items:center;gap:7px;
           padding:0 20px;height:42px;border-radius:var(--r-pill);
-          background:linear-gradient(135deg,var(--cp),var(--cp-d));
+          background:var(--cp);
           color:#fff;font-size:13px;font-weight:700;
           text-decoration:none;border:none;cursor:pointer;
           box-shadow:var(--sh-btn);transition:opacity .15s,transform .1s;
@@ -218,9 +218,9 @@ function Navbar({ studioName, whatsapp }) {
           margin-top:16px;
           display:flex;align-items:center;justify-content:center;gap:8px;
           padding:14px;border-radius:var(--r-pill);
-          background:linear-gradient(135deg,var(--cp),var(--cp-d));
+          background:var(--cp);
           color:#fff;font-size:15px;font-weight:700;
-          text-decoration:none;box-shadow:var(--sh-btn);
+          text-decoration:none;border:none;box-shadow:var(--sh-btn);
           font-family:var(--font);
         }
 
@@ -568,29 +568,108 @@ function PriceGroup({ group }) {
 /* ══════════════════════════════════════════════════
    RESEÑAS
 ══════════════════════════════════════════════════ */
+function ReviewCard({ r }) {
+  return (
+    <div style={{background:'var(--bg)',border:'1.5px solid var(--border)',borderRadius:'var(--r)',padding:24,height:'100%',boxSizing:'border-box'}}>
+      <div style={{display:'flex',gap:3,marginBottom:14,fontSize:16}}>{'⭐'.repeat(Math.min(5,r.stars||5))}</div>
+      <div style={{fontSize:14,color:'var(--text)',lineHeight:1.7,marginBottom:18,fontStyle:'italic'}}>{r.text}</div>
+      <div style={{display:'flex',alignItems:'center',gap:12}}>
+        <div style={{width:40,height:40,borderRadius:'50%',background:'var(--cp-r)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:18,flexShrink:0}}>{r.avatar}</div>
+        <div>
+          <div style={{fontSize:13,fontWeight:700,color:'var(--ink)'}}>{r.name}</div>
+          <div style={{fontSize:11,color:'var(--text-lt)'}}>{r.date}</div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function ReviewsCarousel({ data }) {
+  const [idx, setIdx]     = useState(0)
+  const [touchX, setTouchX] = useState(0)
+  const total = (data||[]).length
+
+  function go(next) { setIdx((next + total) % total) }
+
+  // Auto-avance cada 4.5 s
+  useEffect(() => {
+    if (total <= 1) return
+    const t = setInterval(() => setIdx(i => (i + 1) % total), 4500)
+    return () => clearInterval(t)
+  }, [total])
+
+  if (!total) return null
+
+  return (
+    <div>
+      {/* track deslizable */}
+      <div style={{overflow:'hidden',borderRadius:'var(--r)'}}>
+        <div
+          style={{display:'flex',transform:`translateX(-${idx*100}%)`,transition:'transform .45s cubic-bezier(.4,0,.2,1)'}}
+          onTouchStart={e => setTouchX(e.touches[0].clientX)}
+          onTouchEnd={e => { const dx = e.changedTouches[0].clientX - touchX; if (Math.abs(dx) > 40) go(dx < 0 ? idx+1 : idx-1) }}
+        >
+          {(data||[]).map((r,i) => (
+            <div key={i} style={{minWidth:'100%',padding:'0 2px',boxSizing:'border-box'}}>
+              <ReviewCard r={r} />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* flechas + dots */}
+      <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:12,marginTop:20}}>
+        <button onClick={() => go(idx-1)}
+          style={{width:34,height:34,borderRadius:'50%',background:'var(--cp-r)',border:'1.5px solid var(--blush)',
+            color:'var(--cp)',fontSize:18,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',lineHeight:1,flexShrink:0}}>‹</button>
+
+        <div style={{display:'flex',gap:6,alignItems:'center'}}>
+          {(data||[]).map((_,i) => (
+            <button key={i} onClick={() => go(i)}
+              style={{width:i===idx?22:7,height:7,borderRadius:99,padding:0,border:'none',cursor:'pointer',
+                background:i===idx?'var(--cp)':'var(--cp-r)',transition:'all .3s ease'}} />
+          ))}
+        </div>
+
+        <button onClick={() => go(idx+1)}
+          style={{width:34,height:34,borderRadius:'50%',background:'var(--cp-r)',border:'1.5px solid var(--blush)',
+            color:'var(--cp)',fontSize:18,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',lineHeight:1,flexShrink:0}}>›</button>
+      </div>
+
+      {/* contador */}
+      <div style={{textAlign:'center',marginTop:8,fontSize:12,fontWeight:600,color:'var(--text-lt)'}}>
+        {idx+1} / {total}
+      </div>
+    </div>
+  )
+}
+
 function Reviews({ data }) {
   const ref = useFadeUp()
   return (
     <section style={{background:'var(--card)',padding:'clamp(60px,8vw,100px) clamp(16px,6vw,80px)'}}>
+      <style>{`
+        .rv-grid     { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:20px; }
+        .rv-carousel { display:none; }
+        @media(max-width:640px){
+          .rv-grid     { display:none; }
+          .rv-carousel { display:block; }
+        }
+      `}</style>
       <div style={{maxWidth:1200,margin:'0 auto'}}>
         <div ref={ref} className="fade-up" style={{textAlign:'center',marginBottom:52}}>
           <div style={{display:'inline-flex',padding:'6px 16px',borderRadius:'var(--r-pill)',background:'var(--cp-r)',color:'var(--cp)',fontSize:11,fontWeight:700,textTransform:'uppercase',letterSpacing:'.5px',marginBottom:16}}>💜 Lo que dicen</div>
           <h2 style={{fontSize:'clamp(26px,3.5vw,44px)',fontWeight:900,letterSpacing:'-1px',color:'var(--ink)'}}>CLIENTAS <span style={{color:'var(--cp)'}}>FELICES</span></h2>
         </div>
-        <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(280px,1fr))',gap:20}}>
-          {(data||[]).map((r,i)=>(
-            <div key={i} style={{background:'var(--bg)',border:'1.5px solid var(--border)',borderRadius:'var(--r)',padding:24}}>
-              <div style={{display:'flex',gap:3,marginBottom:14,fontSize:16}}>{'⭐'.repeat(Math.min(5,r.stars||5))}</div>
-              <div style={{fontSize:14,color:'var(--text)',lineHeight:1.7,marginBottom:18,fontStyle:'italic'}}>{r.text}</div>
-              <div style={{display:'flex',alignItems:'center',gap:12}}>
-                <div style={{width:40,height:40,borderRadius:'50%',background:'var(--cp-r)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:18,flexShrink:0}}>{r.avatar}</div>
-                <div>
-                  <div style={{fontSize:13,fontWeight:700,color:'var(--ink)'}}>{r.name}</div>
-                  <div style={{fontSize:11,color:'var(--text-lt)'}}>{r.date}</div>
-                </div>
-              </div>
-            </div>
-          ))}
+
+        {/* Desktop: grilla */}
+        <div className="rv-grid">
+          {(data||[]).map((r,i) => <ReviewCard key={i} r={r} />)}
+        </div>
+
+        {/* Mobile: carrusel */}
+        <div className="rv-carousel">
+          <ReviewsCarousel data={data} />
         </div>
       </div>
     </section>
