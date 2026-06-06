@@ -35,7 +35,7 @@ export const DEFAULT_CONTENT = {
     title: 'UNA PASIÓN QUE', accent: 'SE VE EN LAS MANOS',
     p1: 'Hola, soy la creadora detrás de Pinky Nail Studio. Lo que empezó como una pasión se convirtió en mi forma de vida y en la manera de hacer sentir especial a cada clienta que pasa por mis manos.',
     p2: 'Con más de 5 años de experiencia y formación continua en las últimas tendencias internacionales, me especializo en nail art detallista y diseños únicos que reflejan tu personalidad.',
-    p3: 'Cada sesión es un momento tuyo — un espacio para relajarte, expresarte y salir sintiéndote increíble.',
+    p3: 'Cada sesión es un momento tuyo — un espacio para relajarte, expresarte y salir sintiéndote increíble. Te espero en City Bell 🌸',
     pills: ['✅ Materiales premium','✅ Higiene garantizada','✅ Diseños originales','✅ Atención personalizada'],
     photos: [
       'https://images.unsplash.com/photo-1604654894614-6dd2bc7bd671?auto=format&fit=crop&w=600&q=80',
@@ -86,7 +86,7 @@ export const DEFAULT_CONTENT = {
   contact: {
     whatsapp: '5491100000000',
     instagram: '@_pinkynailstudio',
-    location: 'Buenos Aires, Argentina\nZona a confirmar — consultá por DM',
+    location: 'City Bell, La Plata · Buenos Aires\nAtendemos City Bell, Gonnet, Villa Elisa y alrededores',
     hours: 'Lunes a sábado · Con turno previo',
     ctaTitle: '¡Reservá tu turno!',
     ctaText: 'Escribinos por WhatsApp con el servicio que querés, tu disponibilidad horaria y acordamos la fecha perfecta para vos 🌸',
