@@ -507,21 +507,32 @@ function SpotifyBanner({ data }) {
   const bg     = data.bgColor     || '#FCE4EC'
   const accent = data.accentColor || '#C2185B'
   const ink    = data.textColor   || '#2D1B2E'
+  const spotifySvg = (size) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill={accent} style={{flexShrink:0,filter:`drop-shadow(0 2px 8px ${accent}55)`}}>
+      <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.516 17.312a.75.75 0 01-1.032.249c-2.827-1.727-6.387-2.117-10.58-1.159a.75.75 0 01-.334-1.463c4.588-1.048 8.523-.597 11.697 1.34a.75.75 0 01.249 1.033zm1.472-3.27a.937.937 0 01-1.288.308c-3.234-1.988-8.164-2.564-11.99-1.404a.937.937 0 01-.543-1.79c4.37-1.326 9.8-.683 13.514 1.6a.937.937 0 01.307 1.286zm.127-3.408C15.32 8.39 9.374 8.2 5.595 9.348a1.125 1.125 0 01-.652-2.151c4.32-1.31 11.5-1.057 16.038 1.605a1.125 1.125 0 01-1.116 1.832z"/>
+    </svg>
+  )
   return (
-    <section style={{background:bg,borderTop:`1px solid ${accent}22`,padding:'24px clamp(16px,6vw,80px)'}}>
+    <section style={{background:bg,borderTop:`1px solid ${accent}22`,padding:'clamp(32px,5vw,56px) clamp(16px,6vw,80px)'}}>
       <style>{`
-        .sp-inner{display:flex;align-items:center;justify-content:space-between;gap:20px;max-width:1200px;margin:0 auto;}
-        .sp-left{display:flex;align-items:center;gap:14px;}
-        .sp-text{font-size:15px;font-weight:700;line-height:1.4;font-family:var(--font);}
-        .sp-btn{display:inline-flex;align-items:center;gap:8px;padding:11px 24px;border-radius:var(--r-pill);color:#fff;font-size:13px;font-weight:800;text-decoration:none;white-space:nowrap;transition:opacity .15s,transform .1s;font-family:var(--font);flex-shrink:0;box-shadow:0 4px 16px rgba(0,0,0,.15);}
-        .sp-btn:hover{opacity:.88;transform:translateY(-1px);}
-        @media(max-width:640px){.sp-inner{flex-direction:column;text-align:center;}.sp-left{flex-direction:column;gap:8px;}}
+        .sp-inner{display:flex;flex-direction:column;align-items:center;text-align:center;gap:20px;max-width:800px;margin:0 auto;}
+        .sp-top{display:flex;align-items:center;justify-content:center;gap:16px;}
+        .sp-text{font-size:17px;font-weight:700;line-height:1.5;font-family:var(--font);}
+        .sp-btn{display:inline-flex;align-items:center;gap:8px;padding:13px 28px;border-radius:var(--r-pill);color:#fff;font-size:14px;font-weight:800;text-decoration:none;white-space:nowrap;transition:opacity .15s,transform .1s;font-family:var(--font);box-shadow:0 4px 20px rgba(0,0,0,.15);}
+        .sp-btn:hover{opacity:.88;transform:translateY(-2px);}
+        .sp-logo-desktop{display:block;}
+        .sp-logo-mobile{display:none;}
+        @media(max-width:640px){
+          .sp-top{flex-direction:column;gap:8px;}
+          .sp-text{font-size:15px;}
+          .sp-logo-desktop{display:none;}
+          .sp-logo-mobile{display:block;}
+        }
       `}</style>
       <div className="sp-inner">
-        <div className="sp-left">
-          <svg width="30" height="30" viewBox="0 0 24 24" fill={accent} style={{flexShrink:0,filter:`drop-shadow(0 2px 6px ${accent}55)`}}>
-            <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.516 17.312a.75.75 0 01-1.032.249c-2.827-1.727-6.387-2.117-10.58-1.159a.75.75 0 01-.334-1.463c4.588-1.048 8.523-.597 11.697 1.34a.75.75 0 01.249 1.033zm1.472-3.27a.937.937 0 01-1.288.308c-3.234-1.988-8.164-2.564-11.99-1.404a.937.937 0 01-.543-1.79c4.37-1.326 9.8-.683 13.514 1.6a.937.937 0 01.307 1.286zm.127-3.408C15.32 8.39 9.374 8.2 5.595 9.348a1.125 1.125 0 01-.652-2.151c4.32-1.31 11.5-1.057 16.038 1.605a1.125 1.125 0 01-1.116 1.832z"/>
-          </svg>
+        <div className="sp-top">
+          <span className="sp-logo-desktop">{spotifySvg(48)}</span>
+          <span className="sp-logo-mobile">{spotifySvg(30)}</span>
           <span className="sp-text" style={{color:ink}}>{data.text}</span>
         </div>
         <a href={data.url} target="_blank" rel="noreferrer" className="sp-btn" style={{background:accent}}>
