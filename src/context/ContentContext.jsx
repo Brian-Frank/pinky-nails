@@ -86,7 +86,7 @@ export const DEFAULT_CONTENT = {
   contact: {
     whatsapp: '5491100000000',
     instagram: '@_pinkynailstudio',
-    location: 'City Bell, La Plata · Buenos Aires\nAtendemos City Bell, Gonnet, Villa Elisa y alrededores',
+    location: 'City Bell, La Plata · Buenos Aires\nAtendemos City Bell, Gonnet, Villa Elisa, Tolosa y alrededores',
     hours: 'Lunes a sábado · Con turno previo',
     ctaTitle: '¡Reservá tu turno!',
     ctaText: 'Escribinos por WhatsApp con el servicio que querés, tu disponibilidad horaria y acordamos la fecha perfecta para vos 🌸',
