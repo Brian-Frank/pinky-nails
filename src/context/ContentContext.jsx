@@ -102,6 +102,9 @@ export const DEFAULT_CONTENT = {
   spotify: {
     text: '¿Querés saber qué canciones se escuchan en Pinky? 🎵',
     url: 'https://open.spotify.com/playlist/',
+    bgColor:     '#FCE4EC',
+    accentColor: '#C2185B',
+    textColor:   '#2D1B2E',
   },
 }
 

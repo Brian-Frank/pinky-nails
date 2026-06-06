@@ -685,7 +685,10 @@ function AppearanceEditor() {
 ═══════════════════════════════════════════════════════════ */
 function SpotifyEditor() {
   const { content, updateSection } = useContent()
-  const [d, setD] = useState(content.spotify || { text: '', url: '' })
+  const [d, setD] = useState({
+    bgColor:'#FCE4EC', accentColor:'#C2185B', textColor:'#2D1B2E',
+    ...(content.spotify || {}),
+  })
   const [saving, setSaving] = useState(false)
 
   async function save() {
@@ -694,17 +697,53 @@ function SpotifyEditor() {
     setSaving(false)
   }
 
+  function colorField(label, key, placeholder) {
+    return (
+      <div className="a-field">
+        <label>{label}</label>
+        <div style={{display:'flex',gap:8,alignItems:'center'}}>
+          <input type="color" value={d[key]} onChange={e=>setD({...d,[key]:e.target.value})}
+            style={{width:48,height:40,border:'none',cursor:'pointer',background:'none'}} />
+          <input value={d[key]} onChange={e=>setD({...d,[key]:e.target.value})}
+            style={{flex:1}} placeholder={placeholder} />
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="a-section">
       <h2 className="a-section-title">🎵 Spotify Banner</h2>
+
       <div className="a-field">
         <label>Frase del banner</label>
         <input value={d.text} onChange={e=>setD({...d,text:e.target.value})} placeholder="¿Querés saber qué canciones se escuchan en Pinky? 🎵" />
       </div>
+
       <div className="a-field">
         <label>Link de Spotify (playlist o perfil)</label>
         <input value={d.url} onChange={e=>setD({...d,url:e.target.value})} placeholder="https://open.spotify.com/playlist/..." />
       </div>
+
+      <div className="a-row">
+        {colorField('Color de fondo',  'bgColor',     '#FCE4EC')}
+        {colorField('Color de acento', 'accentColor', '#C2185B')}
+        {colorField('Color del texto', 'textColor',   '#2D1B2E')}
+      </div>
+
+      {/* Preview en tiempo real */}
+      <div style={{background:d.bgColor,borderRadius:12,padding:'20px 24px',border:`2px solid ${d.accentColor}33`,display:'flex',alignItems:'center',justifyContent:'space-between',gap:16,marginTop:8,flexWrap:'wrap'}}>
+        <div style={{display:'flex',alignItems:'center',gap:12}}>
+          <svg width="26" height="26" viewBox="0 0 24 24" fill={d.accentColor} style={{flexShrink:0}}>
+            <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.516 17.312a.75.75 0 01-1.032.249c-2.827-1.727-6.387-2.117-10.58-1.159a.75.75 0 01-.334-1.463c4.588-1.048 8.523-.597 11.697 1.34a.75.75 0 01.249 1.033zm1.472-3.27a.937.937 0 01-1.288.308c-3.234-1.988-8.164-2.564-11.99-1.404a.937.937 0 01-.543-1.79c4.37-1.326 9.8-.683 13.514 1.6a.937.937 0 01.307 1.286zm.127-3.408C15.32 8.39 9.374 8.2 5.595 9.348a1.125 1.125 0 01-.652-2.151c4.32-1.31 11.5-1.057 16.038 1.605a1.125 1.125 0 01-1.116 1.832z"/>
+          </svg>
+          <span style={{fontSize:14,fontWeight:700,color:d.textColor}}>{d.text || 'Frase del banner...'}</span>
+        </div>
+        <div style={{background:d.accentColor,color:'#fff',borderRadius:99,padding:'8px 18px',fontSize:12,fontWeight:800,flexShrink:0}}>
+          Escuchar playlist →
+        </div>
+      </div>
+
       <SaveBtn saving={saving} onClick={save} />
     </div>
   )
