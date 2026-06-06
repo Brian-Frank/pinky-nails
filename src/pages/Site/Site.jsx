@@ -500,6 +500,36 @@ function PhotoCarousel({ photos }) {
 }
 
 /* ══════════════════════════════════════════════════
+   SPOTIFY BANNER
+══════════════════════════════════════════════════ */
+function SpotifyBanner({ data }) {
+  if (!data?.url || !data?.text) return null
+  return (
+    <div style={{background:'#0f0f0f',padding:'22px clamp(16px,6vw,80px)'}}>
+      <style>{`
+        .sp-inner{display:flex;align-items:center;justify-content:space-between;gap:20px;max-width:1200px;margin:0 auto;}
+        .sp-left{display:flex;align-items:center;gap:14px;}
+        .sp-text{font-size:15px;font-weight:700;color:#fff;line-height:1.4;}
+        .sp-btn{display:inline-flex;align-items:center;gap:8px;padding:10px 22px;border-radius:99px;background:#1DB954;color:#fff;font-size:13px;font-weight:800;text-decoration:none;white-space:nowrap;transition:opacity .15s,transform .1s;font-family:var(--font);flex-shrink:0;}
+        .sp-btn:hover{opacity:.88;transform:translateY(-1px);}
+        @media(max-width:640px){.sp-inner{flex-direction:column;text-align:center;}.sp-left{flex-direction:column;gap:8px;}}
+      `}</style>
+      <div className="sp-inner">
+        <div className="sp-left">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="#1DB954" style={{flexShrink:0}}>
+            <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.516 17.312a.75.75 0 01-1.032.249c-2.827-1.727-6.387-2.117-10.58-1.159a.75.75 0 01-.334-1.463c4.588-1.048 8.523-.597 11.697 1.34a.75.75 0 01.249 1.033zm1.472-3.27a.937.937 0 01-1.288.308c-3.234-1.988-8.164-2.564-11.99-1.404a.937.937 0 01-.543-1.79c4.37-1.326 9.8-.683 13.514 1.6a.937.937 0 01.307 1.286zm.127-3.408C15.32 8.39 9.374 8.2 5.595 9.348a1.125 1.125 0 01-.652-2.151c4.32-1.31 11.5-1.057 16.038 1.605a1.125 1.125 0 01-1.116 1.832z"/>
+          </svg>
+          <span className="sp-text">{data.text}</span>
+        </div>
+        <a href={data.url} target="_blank" rel="noreferrer" className="sp-btn">
+          Escuchar playlist →
+        </a>
+      </div>
+    </div>
+  )
+}
+
+/* ══════════════════════════════════════════════════
    SOBRE MÍ
 ══════════════════════════════════════════════════ */
 function About({ data, instagram }) {
@@ -859,7 +889,7 @@ export default function Site() {
     </div>
   )
 
-  const { hero, services, gallery, about, pricing, reviews, contact, theme } = content
+  const { hero, services, gallery, about, pricing, reviews, contact, theme, spotify } = content
   const wa = contact?.whatsapp
   const ig = contact?.instagram
 
@@ -868,6 +898,7 @@ export default function Site() {
       <Navbar studioName={theme?.studioName} whatsapp={wa} instagram={ig} />
       <Hero data={hero} whatsapp={wa} />
       <Services data={services} />
+      <SpotifyBanner data={spotify} />
       <About data={about} instagram={ig} />
       <Gallery data={gallery} instagram={ig} />
       <Pricing data={pricing} whatsapp={wa} />

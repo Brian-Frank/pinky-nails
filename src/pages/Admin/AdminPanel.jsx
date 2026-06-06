@@ -681,6 +681,36 @@ function AppearanceEditor() {
 }
 
 /* ═══════════════════════════════════════════════════════════
+   SPOTIFY EDITOR
+═══════════════════════════════════════════════════════════ */
+function SpotifyEditor() {
+  const { content, updateSection } = useContent()
+  const [d, setD] = useState(content.spotify || { text: '', url: '' })
+  const [saving, setSaving] = useState(false)
+
+  async function save() {
+    setSaving(true)
+    try { await updateSection('spotify', d) } catch(e) { alert(e.message) }
+    setSaving(false)
+  }
+
+  return (
+    <div className="a-section">
+      <h2 className="a-section-title">🎵 Spotify Banner</h2>
+      <div className="a-field">
+        <label>Frase del banner</label>
+        <input value={d.text} onChange={e=>setD({...d,text:e.target.value})} placeholder="¿Querés saber qué canciones se escuchan en Pinky? 🎵" />
+      </div>
+      <div className="a-field">
+        <label>Link de Spotify (playlist o perfil)</label>
+        <input value={d.url} onChange={e=>setD({...d,url:e.target.value})} placeholder="https://open.spotify.com/playlist/..." />
+      </div>
+      <SaveBtn saving={saving} onClick={save} />
+    </div>
+  )
+}
+
+/* ═══════════════════════════════════════════════════════════
    MAIN ADMIN PANEL
 ═══════════════════════════════════════════════════════════ */
 const TABS = [
@@ -692,6 +722,7 @@ const TABS = [
   { id:'reviews',    label:'⭐ Reseñas' },
   { id:'contact',    label:'📞 Contacto' },
   { id:'appearance', label:'🎨 Apariencia' },
+  { id:'spotify',    label:'🎵 Spotify' },
 ]
 
 export default function AdminPanel() {
@@ -728,6 +759,7 @@ export default function AdminPanel() {
     reviews:    <ReviewsEditor />,
     contact:    <ContactEditor />,
     appearance: <AppearanceEditor />,
+    spotify:    <SpotifyEditor />,
   }
 
   return (

@@ -99,6 +99,10 @@ export const DEFAULT_CONTENT = {
     studioName: 'Pinky Nail Studio',
     footerTagline: 'Hecho con 💜 en Buenos Aires',
   },
+  spotify: {
+    text: '¿Querés saber qué canciones se escuchan en Pinky? 🎵',
+    url: 'https://open.spotify.com/playlist/',
+  },
 }
 
 const SECTIONS = Object.keys(DEFAULT_CONTENT)
