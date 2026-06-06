@@ -302,8 +302,8 @@ function Hero({ data, whatsapp }) {
           </div>
           <div style={{display:'flex',gap:32}}>
             {(data.stats||[]).map(s=>(
-              <div key={s.label}>
-                <div style={{fontSize:32,fontWeight:900,color:'var(--cp)',lineHeight:1}}>{s.num}</div>
+              <div key={s.label} style={{textAlign:'center'}}>
+                <div style={{fontSize: s.num==='∞' ? 48 : 32,fontWeight:900,color:'var(--cp)',lineHeight:1,height:38,display:'flex',alignItems:'center',justifyContent:'center'}}>{s.num}</div>
                 <div style={{fontSize:11,fontWeight:600,color:'var(--text-lt)',textTransform:'uppercase',letterSpacing:'.5px',marginTop:4}}>{s.label}</div>
               </div>
             ))}
@@ -313,7 +313,7 @@ function Hero({ data, whatsapp }) {
           <div style={{width:'clamp(260px,38vw,480px)',aspectRatio:'3/4',borderRadius:40,overflow:'hidden',boxShadow:'0 24px 64px rgba(194,24,91,.2)',position:'relative'}}>
             <img src={data.image} alt="Pinky Nail Studio" style={{width:'100%',height:'100%',objectFit:'cover'}} />
           </div>
-          <div style={{position:'absolute',bottom:-24,left:-28,background:'var(--card)',borderRadius:'var(--r)',padding:'16px 20px',boxShadow:'var(--sh-lg)',border:'1.5px solid var(--border)',fontSize:13,fontWeight:700,color:'var(--ink)',display:'flex',alignItems:'center',gap:10}}>
+          <div className="hero-float-card" style={{position:'absolute',bottom:-24,left:-28,background:'var(--card)',borderRadius:'var(--r)',padding:'16px 20px',boxShadow:'var(--sh-lg)',border:'1.5px solid var(--border)',fontSize:13,fontWeight:700,color:'var(--ink)',display:'flex',alignItems:'center',gap:10}}>
             <div style={{width:8,height:8,borderRadius:'50%',background:'#22c55e',boxShadow:'0 0 0 3px rgba(34,197,94,.2)'}} />
             {data.floatCard1}
           </div>
@@ -323,7 +323,12 @@ function Hero({ data, whatsapp }) {
           </div>
         </div>
       </div>
-      <style>{`@media(max-width:900px){.hero-inner{grid-template-columns:1fr!important;text-align:center;gap:40px!important;padding:60px 0 80px!important}}`}</style>
+      <style>{`
+        @media(max-width:900px){
+          .hero-inner{grid-template-columns:1fr!important;text-align:center;gap:40px!important;padding:60px 0 80px!important}
+          .hero-float-card{left:50%!important;transform:translateX(-50%)!important;white-space:nowrap;}
+        }
+      `}</style>
     </section>
   )
 }
@@ -331,29 +336,96 @@ function Hero({ data, whatsapp }) {
 /* ══════════════════════════════════════════════════
    SERVICIOS
 ══════════════════════════════════════════════════ */
+function ServicesCarousel({ data }) {
+  const [idx, setIdx] = useState(0)
+  const [touchX, setTouchX] = useState(0)
+  const total = (data||[]).length
+
+  function go(next) { setIdx((next + total) % total) }
+
+  useEffect(() => {
+    if (total <= 1) return
+    const t = setInterval(() => setIdx(i => (i + 1) % total), 3800)
+    return () => clearInterval(t)
+  }, [total])
+
+  if (!total) return null
+
+  return (
+    <div>
+      <div style={{overflow:'hidden',borderRadius:'var(--r)'}}>
+        <div
+          style={{display:'flex',transform:`translateX(-${idx*100}%)`,transition:'transform .45s cubic-bezier(.4,0,.2,1)'}}
+          onTouchStart={e => setTouchX(e.touches[0].clientX)}
+          onTouchEnd={e => { const dx = e.changedTouches[0].clientX - touchX; if (Math.abs(dx) > 40) go(dx < 0 ? idx+1 : idx-1) }}
+        >
+          {(data||[]).map((s,i) => (
+            <div key={i} style={{minWidth:'100%',padding:'0 2px',boxSizing:'border-box'}}>
+              <ServiceCard s={s} noFade />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:12,marginTop:20}}>
+        <button onClick={() => go(idx-1)}
+          style={{width:34,height:34,borderRadius:'50%',background:'var(--cp-r)',border:'1.5px solid var(--blush)',
+            color:'var(--cp)',fontSize:18,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',lineHeight:1,flexShrink:0}}>‹</button>
+        <div style={{display:'flex',gap:6,alignItems:'center'}}>
+          {(data||[]).map((_,i) => (
+            <button key={i} onClick={() => go(i)}
+              style={{width:i===idx?22:7,height:7,borderRadius:99,padding:0,border:'none',cursor:'pointer',
+                background:i===idx?'var(--cp)':'var(--cp-r)',transition:'all .3s ease'}} />
+          ))}
+        </div>
+        <button onClick={() => go(idx+1)}
+          style={{width:34,height:34,borderRadius:'50%',background:'var(--cp-r)',border:'1.5px solid var(--blush)',
+            color:'var(--cp)',fontSize:18,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',lineHeight:1,flexShrink:0}}>›</button>
+      </div>
+      <div style={{textAlign:'center',marginTop:8,fontSize:12,fontWeight:600,color:'var(--text-lt)'}}>
+        {idx+1} / {total}
+      </div>
+    </div>
+  )
+}
+
 function Services({ data }) {
-  const ref = useFadeUp()
   return (
     <section id="servicios" style={{background:'var(--card)',padding:'clamp(60px,8vw,100px) clamp(16px,6vw,80px)'}}>
+      <style>{`
+        .svc-grid     { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:20px; }
+        .svc-carousel { display:none; }
+        @media(max-width:640px){
+          .svc-grid     { display:none; }
+          .svc-carousel { display:block; }
+        }
+      `}</style>
       <div style={{maxWidth:1200,margin:'0 auto'}}>
-        <div ref={ref} className="fade-up" style={{textAlign:'center',marginBottom:52}}>
+        <div style={{textAlign:'center',marginBottom:52}}>
           <div style={{display:'inline-flex',padding:'6px 16px',borderRadius:'var(--r-pill)',background:'var(--cp-r)',color:'var(--cp)',fontSize:11,fontWeight:700,textTransform:'uppercase',letterSpacing:'.5px',marginBottom:16}}>💅 Lo que hacemos</div>
           <h2 style={{fontSize:'clamp(26px,3.5vw,44px)',fontWeight:900,letterSpacing:'-1px',color:'var(--ink)',marginBottom:14}}>NUESTROS <span style={{color:'var(--cp)'}}>SERVICIOS</span></h2>
           <p style={{fontSize:15,color:'var(--text)',lineHeight:1.7,maxWidth:540,margin:'0 auto'}}>Desde una manicura clásica hasta los diseños más creativos. Cada servicio con productos de primera calidad.</p>
         </div>
-        <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(280px,1fr))',gap:20}}>
+
+        {/* Desktop: grilla */}
+        <div className="svc-grid">
           {(data||[]).map((s,i) => <ServiceCard key={i} s={s} />)}
+        </div>
+
+        {/* Mobile: carrusel */}
+        <div className="svc-carousel">
+          <ServicesCarousel data={data} />
         </div>
       </div>
     </section>
   )
 }
 
-function ServiceCard({ s }) {
+function ServiceCard({ s, noFade }) {
   const ref = useFadeUp()
   const [hover, setHover] = useState(false)
   return (
-    <div ref={ref} className="fade-up"
+    <div ref={noFade ? null : ref} className={noFade ? '' : 'fade-up'}
       onMouseEnter={()=>setHover(true)} onMouseLeave={()=>setHover(false)}
       style={{background:'var(--bg)',border:'1.5px solid var(--border)',borderRadius:'var(--r)',padding:'28px 24px',transition:'transform .2s,box-shadow .2s,border-color .2s',transform:hover?'translateY(-4px)':'none',boxShadow:hover?'var(--sh-lg)':'none',borderColor:hover?'var(--cp-r)':'var(--border)',cursor:'default',position:'relative',overflow:'hidden'}}>
       <div style={{width:52,height:52,borderRadius:14,background:hover?'linear-gradient(135deg,var(--cp),var(--cp-d))':'var(--cp-r)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:hover?20:24,marginBottom:18,transition:'all .2s'}}>{s.icon}</div>
