@@ -191,7 +191,7 @@ function HeroEditor() {
 
   return (
     <div className="a-section">
-      <h2 className="a-section-title">🏠 Hero</h2>
+      <h2 className="a-section-title">🏠 Inicio</h2>
 
       <div className="a-field"><label>Badge</label>
         <input value={d.badge} onChange={e=>setD({...d,badge:e.target.value})} /></div>
