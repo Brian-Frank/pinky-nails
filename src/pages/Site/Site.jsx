@@ -317,10 +317,6 @@ function Hero({ data, whatsapp }) {
             <div style={{width:8,height:8,borderRadius:'50%',background:'#22c55e',boxShadow:'0 0 0 3px rgba(34,197,94,.2)'}} />
             {data.floatCard1}
           </div>
-          <div style={{position:'absolute',top:24,right:-28,background:'linear-gradient(135deg,var(--cp),var(--cp-d))',borderRadius:'var(--r)',padding:'14px 18px',boxShadow:'var(--sh-btn)',color:'#fff',textAlign:'center'}}>
-            <div style={{fontSize:26,fontWeight:900,lineHeight:1}}>★ 5.0</div>
-            <div style={{fontSize:10,fontWeight:700,opacity:.8,textTransform:'uppercase',letterSpacing:'.4px'}}>Instagram</div>
-          </div>
         </div>
       </div>
       <style>{`
@@ -560,11 +556,11 @@ function About({ data, instagram }) {
           <div ref={ref1} className="fade-up" style={{position:'relative',height:520}}>
             <PhotoCarousel photos={photos} />
             <div style={{position:'absolute',top:20,left:-16,zIndex:3,
-              background:'linear-gradient(135deg,var(--cp),var(--cp-d))',
+              background:'var(--cp)',
               color:'#fff',borderRadius:16,padding:'14px 18px',
               boxShadow:'var(--sh-btn)',textAlign:'center'}}>
-              <div style={{fontSize:28,lineHeight:1}}>💜</div>
-              <div style={{fontSize:10,opacity:.85,textTransform:'uppercase',letterSpacing:'.4px'}}>Hecho con amor</div>
+              <div style={{fontSize:28,lineHeight:1}}>{data.loveEmoji ?? '💜'}</div>
+              <div style={{fontSize:10,opacity:.85,textTransform:'uppercase',letterSpacing:'.4px'}}>{data.loveText ?? 'Hecho con amor'}</div>
             </div>
           </div>
 

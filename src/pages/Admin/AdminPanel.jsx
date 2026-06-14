@@ -374,6 +374,13 @@ function AboutEditor() {
       <div className="a-field"><label>Párrafo 3</label>
         <textarea rows={3} value={d.p3} onChange={e=>setD({...d,p3:e.target.value})} /></div>
 
+      <div className="a-row">
+        <div className="a-field"><label>Emoji tarjeta "Hecho con amor"</label>
+          <input value={d.loveEmoji ?? '💜'} onChange={e=>setD({...d,loveEmoji:e.target.value})} maxLength={4} /></div>
+        <div className="a-field"><label>Texto tarjeta</label>
+          <input value={d.loveText ?? 'Hecho con amor'} onChange={e=>setD({...d,loveText:e.target.value})} /></div>
+      </div>
+
       <div className="a-field">
         <label>Etiquetas / Pills</label>
         {d.pills.map((p,i)=>(

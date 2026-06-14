@@ -37,6 +37,8 @@ export const DEFAULT_CONTENT = {
     p2: 'Con más de 5 años de experiencia y formación continua en las últimas tendencias internacionales, me especializo en nail art detallista y diseños únicos que reflejan tu personalidad.',
     p3: 'Cada sesión es un momento tuyo — un espacio para relajarte, expresarte y salir sintiéndote increíble. Te espero en City Bell 🌸',
     pills: ['✅ Materiales premium','✅ Higiene garantizada','✅ Diseños originales','✅ Atención personalizada'],
+    loveEmoji: '💜',
+    loveText: 'Hecho con amor',
     photos: [
       'https://images.unsplash.com/photo-1604654894614-6dd2bc7bd671?auto=format&fit=crop&w=600&q=80',
       'https://images.unsplash.com/photo-1604654894618-6e8ac44d5b40?auto=format&fit=crop&w=400&q=80',
