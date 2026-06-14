@@ -93,6 +93,7 @@ export const DEFAULT_CONTENT = {
     ctaTitle: '¡Reservá tu turno!',
     ctaText: 'Escribinos por WhatsApp con el servicio que querés, tu disponibilidad horaria y acordamos la fecha perfecta para vos 🌸',
     replyTime: 'Respondemos en menos de 1 hora ✨',
+    floatWa: { enabled: true, color: '#25D366' },
   },
   theme: {
     primaryColor: '#C2185B',

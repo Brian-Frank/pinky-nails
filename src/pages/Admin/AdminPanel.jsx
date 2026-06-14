@@ -603,6 +603,30 @@ function ContactEditor() {
         <input value={d.replyTime} onChange={e=>setD({...d,replyTime:e.target.value})} />
       </div>
 
+      <div className="a-row">
+        <div className="a-field">
+          <label>Botón flotante de WhatsApp (solo mobile)</label>
+          <label style={{display:'flex',alignItems:'center',gap:10,cursor:'pointer',fontWeight:500,padding:'10px 0'}}>
+            <input type="checkbox"
+              checked={(d.floatWa?.enabled) !== false}
+              onChange={e=>setD({...d, floatWa:{...(d.floatWa||{color:'#25D366'}), enabled:e.target.checked}})}
+              style={{width:18,height:18,cursor:'pointer'}} />
+            Mostrar el botón flotante
+          </label>
+        </div>
+        <div className="a-field">
+          <label>Color del botón</label>
+          <div style={{display:'flex',gap:8,alignItems:'center'}}>
+            <input type="color" value={d.floatWa?.color || '#25D366'}
+              onChange={e=>setD({...d, floatWa:{...(d.floatWa||{enabled:true}), color:e.target.value}})}
+              style={{width:48,height:40,border:'none',cursor:'pointer',background:'none'}} />
+            <input value={d.floatWa?.color || '#25D366'}
+              onChange={e=>setD({...d, floatWa:{...(d.floatWa||{enabled:true}), color:e.target.value}})}
+              style={{flex:1}} placeholder="#25D366" />
+          </div>
+        </div>
+      </div>
+
       <SaveBtn saving={saving} onClick={save} />
     </div>
   )

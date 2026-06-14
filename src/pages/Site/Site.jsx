@@ -592,11 +592,21 @@ function Gallery({ data, instagram }) {
   const ref = useFadeUp()
   const [lb, setLb] = useState(null)
   const [expanded, setExpanded] = useState(false)
+  const btnRef = useRef(null)
   const ig = (instagram||'').replace('@','')
   const photos = data || []
   const INITIAL = 7
   const hasMore = photos.length > INITIAL
   const visible = expanded ? photos : photos.slice(0, INITIAL)
+
+  function toggleExpand() {
+    const collapsing = expanded
+    setExpanded(!expanded)
+    if (collapsing) {
+      // al colapsar, mantener al usuario sobre el boton (sino el scroll queda mas abajo)
+      requestAnimationFrame(() => btnRef.current?.scrollIntoView({ block:'center', behavior:'smooth' }))
+    }
+  }
   return (
     <section id="galeria" style={{background:'var(--card)',padding:'clamp(60px,8vw,100px) clamp(16px,6vw,80px)'}}>
       <div style={{maxWidth:1200,margin:'0 auto'}}>
@@ -626,7 +636,7 @@ function Gallery({ data, instagram }) {
         </div>
         <div style={{display:'flex',gap:14,justifyContent:'center',flexWrap:'wrap',marginTop:36}}>
           {hasMore && (
-            <button onClick={()=>setExpanded(e=>!e)} style={{...btnPrimary}}>
+            <button ref={btnRef} onClick={toggleExpand} style={{...btnPrimary}}>
               {expanded ? '↑ Ver menos' : `Ver más fotos (+${photos.length-INITIAL})`}
             </button>
           )}
@@ -893,6 +903,69 @@ function Footer({ theme, instagram, whatsapp }) {
 }
 
 /* ══════════════════════════════════════════════════
+   BOTÓN FLOTANTE WHATSAPP (solo mobile, arrastrable)
+══════════════════════════════════════════════════ */
+function WhatsAppFAB({ whatsapp, config }) {
+  const wa = (whatsapp || '5491100000000').replace(/\D/g, '')
+  const enabled = config?.enabled !== false
+  const color = config?.color || '#25D366'
+  const [pos, setPos] = useState(null)          // {left, top} tras arrastrar; null = esquina por defecto
+  const elRef = useRef(null)
+  const drag = useRef({ active:false, moved:false, startX:0, startY:0, offX:0, offY:0 })
+
+  useEffect(() => {
+    try { const s = localStorage.getItem('pinky-wa-pos'); if (s) setPos(JSON.parse(s)) } catch {}
+  }, [])
+
+  if (!enabled) return null
+
+  const SIZE = 56, MARGIN = 14
+
+  function onDown(e) {
+    const r = elRef.current.getBoundingClientRect()
+    drag.current = { active:true, moved:false, startX:e.clientX, startY:e.clientY, offX:e.clientX - r.left, offY:e.clientY - r.top }
+    elRef.current.setPointerCapture(e.pointerId)
+  }
+  function onMove(e) {
+    const d = drag.current
+    if (!d.active) return
+    if (Math.abs(e.clientX - d.startX) > 6 || Math.abs(e.clientY - d.startY) > 6) d.moved = true
+    if (!d.moved) return
+    const left = Math.max(MARGIN, Math.min(window.innerWidth  - SIZE - MARGIN, e.clientX - d.offX))
+    const top  = Math.max(MARGIN, Math.min(window.innerHeight - SIZE - MARGIN, e.clientY - d.offY))
+    setPos({ left, top })
+  }
+  function onUp() {
+    const d = drag.current
+    d.active = false
+    if (d.moved) {
+      const r = elRef.current.getBoundingClientRect()
+      const p = { left:r.left, top:r.top }
+      setPos(p)
+      try { localStorage.setItem('pinky-wa-pos', JSON.stringify(p)) } catch {}
+    } else {
+      window.open(`https://wa.me/${wa}?text=Hola!%20Quiero%20reservar%20un%20turno%20%F0%9F%98%8A`, '_blank', 'noopener')
+    }
+  }
+
+  return (
+    <>
+      <div ref={elRef} className="wa-fab" aria-label="Escribinos por WhatsApp"
+        onPointerDown={onDown} onPointerMove={onMove} onPointerUp={onUp}
+        style={{position:'fixed',zIndex:60,width:SIZE,height:SIZE,borderRadius:'50%',background:color,
+          color:'#fff',display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer',
+          touchAction:'none',userSelect:'none',boxShadow:'0 6px 22px rgba(0,0,0,.28)',
+          ...(pos ? {left:pos.left,top:pos.top} : {right:MARGIN,bottom:MARGIN})}}>
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M.057 24l1.687-6.163a11.867 11.867 0 0 1-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.82 11.82 0 0 1 8.413 3.488 11.82 11.82 0 0 1 3.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 0 1-5.688-1.448L.057 24zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.86 9.86 0 0 0 1.519 5.256l-.999 3.648 3.97-1.003zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413z"/>
+        </svg>
+      </div>
+      <style>{`@media(min-width:769px){.wa-fab{display:none!important}}`}</style>
+    </>
+  )
+}
+
+/* ══════════════════════════════════════════════════
    SITE — main export
 ══════════════════════════════════════════════════ */
 export default function Site() {
@@ -931,6 +1004,7 @@ export default function Site() {
       <Reviews data={reviews} />
       <Contact data={contact} />
       <Footer theme={theme} instagram={ig} whatsapp={wa} />
+      <WhatsAppFAB whatsapp={wa} config={contact?.floatWa} />
     </>
   )
 }
