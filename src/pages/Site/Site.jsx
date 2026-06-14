@@ -591,7 +591,12 @@ function About({ data, instagram }) {
 function Gallery({ data, instagram }) {
   const ref = useFadeUp()
   const [lb, setLb] = useState(null)
+  const [expanded, setExpanded] = useState(false)
   const ig = (instagram||'').replace('@','')
+  const photos = data || []
+  const INITIAL = 7
+  const hasMore = photos.length > INITIAL
+  const visible = expanded ? photos : photos.slice(0, INITIAL)
   return (
     <section id="galeria" style={{background:'var(--card)',padding:'clamp(60px,8vw,100px) clamp(16px,6vw,80px)'}}>
       <div style={{maxWidth:1200,margin:'0 auto'}}>
@@ -600,9 +605,10 @@ function Gallery({ data, instagram }) {
           <h2 style={{fontSize:'clamp(26px,3.5vw,44px)',fontWeight:900,letterSpacing:'-1px',color:'var(--ink)',marginBottom:14}}>LA <span style={{color:'var(--cp)'}}>GALERÍA</span></h2>
           <p style={{fontSize:15,color:'var(--text)',lineHeight:1.7,maxWidth:540,margin:'0 auto'}}>Cada trabajo es único. Explorá algunos de nuestros diseños favoritos.</p>
         </div>
-        <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:16}}>
-          {(data||[]).map((g,i)=>(
+        <div className="gallery-grid" style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:16}}>
+          {visible.map((g,i)=>(
             <div key={i} onClick={()=>setLb(i)}
+              className={i>=INITIAL?'g-reveal':undefined}
               style={{aspectRatio:'1',borderRadius:'var(--r)',overflow:'hidden',position:'relative',cursor:'pointer',
                 ...(i===0?{gridColumn:'span 2',gridRow:'span 2',aspectRatio:'auto'}:{})}}>
               <img src={g.image} alt={g.label} loading="lazy"
@@ -618,12 +624,21 @@ function Gallery({ data, instagram }) {
             </div>
           ))}
         </div>
-        <div style={{textAlign:'center',marginTop:36}}>
+        <div style={{display:'flex',gap:14,justifyContent:'center',flexWrap:'wrap',marginTop:36}}>
+          {hasMore && (
+            <button onClick={()=>setExpanded(e=>!e)} style={{...btnPrimary}}>
+              {expanded ? '↑ Ver menos' : `Ver más fotos (+${photos.length-INITIAL})`}
+            </button>
+          )}
           <a href={`https://www.instagram.com/${ig}/`} target="_blank" rel="noreferrer" style={{...btnOutline,display:'inline-flex'}}>Ver más en Instagram →</a>
         </div>
       </div>
-      {lb !== null && <Lightbox items={data||[]} startIdx={lb} onClose={()=>setLb(null)} />}
-      <style>{`@media(max-width:600px){.gallery-grid{grid-template-columns:repeat(2,1fr)!important}}`}</style>
+      {lb !== null && <Lightbox items={photos} startIdx={lb} onClose={()=>setLb(null)} />}
+      <style>{`
+        @media(max-width:600px){.gallery-grid{grid-template-columns:repeat(2,1fr)!important}}
+        .g-reveal{animation:gReveal .45s ease both}
+        @keyframes gReveal{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+      `}</style>
     </section>
   )
 }
