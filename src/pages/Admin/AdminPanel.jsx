@@ -760,7 +760,7 @@ function SpotifyEditor() {
    MAIN ADMIN PANEL
 ═══════════════════════════════════════════════════════════ */
 const TABS = [
-  { id:'hero',       label:'🏠 Hero' },
+  { id:'hero',       label:'🏠 Inicio' },
   { id:'services',   label:'💅 Servicios' },
   { id:'gallery',    label:'📸 Galería' },
   { id:'about',      label:'🌸 Sobre mí' },
@@ -1074,7 +1074,7 @@ const LOGIN_CSS = `
     margin-top: 4px;
     width: 100%;
     padding: 15px 24px;
-    background: linear-gradient(135deg, #e91e8c, #880E4F);
+    background: #e91e8c;
     color: #fff;
     border: none;
     border-radius: 14px;
@@ -1267,7 +1267,7 @@ const ADMIN_CSS = `
 
   /* ── buttons ── */
   .a-btn-primary {
-    background:linear-gradient(135deg,var(--cp),var(--cp-d));
+    background:var(--cp);
     color:#fff; border:none; border-radius:12px;
     padding:12px 28px; font-size:14px; font-weight:700;
     cursor:pointer; transition:.2s; align-self:flex-start;
