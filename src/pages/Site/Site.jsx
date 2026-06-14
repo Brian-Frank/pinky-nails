@@ -605,7 +605,7 @@ function Gallery({ data, instagram }) {
           <h2 style={{fontSize:'clamp(26px,3.5vw,44px)',fontWeight:900,letterSpacing:'-1px',color:'var(--ink)',marginBottom:14}}>LA <span style={{color:'var(--cp)'}}>GALERÍA</span></h2>
           <p style={{fontSize:15,color:'var(--text)',lineHeight:1.7,maxWidth:540,margin:'0 auto'}}>Cada trabajo es único. Explorá algunos de nuestros diseños favoritos.</p>
         </div>
-        <div className="gallery-grid" style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:16}}>
+        <div className="gallery-grid" style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:16}}>
           {visible.map((g,i)=>(
             <div key={i} onClick={()=>setLb(i)}
               className={i>=INITIAL?'g-reveal':undefined}
@@ -635,6 +635,7 @@ function Gallery({ data, instagram }) {
       </div>
       {lb !== null && <Lightbox items={photos} startIdx={lb} onClose={()=>setLb(null)} />}
       <style>{`
+        @media(max-width:900px){.gallery-grid{grid-template-columns:repeat(3,1fr)!important}}
         @media(max-width:600px){.gallery-grid{grid-template-columns:repeat(2,1fr)!important}}
         .g-reveal{animation:gReveal .45s ease both}
         @keyframes gReveal{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
