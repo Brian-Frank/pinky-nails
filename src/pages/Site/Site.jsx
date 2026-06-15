@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState, useCallback } from 'react'
-import { useContent } from '../../context/ContentContext'
+import { Fragment, useEffect, useRef, useState, useCallback } from 'react'
+import { useContent, DEFAULT_LAYOUT } from '../../context/ContentContext'
 
 /* ─── Shared button styles ─── */
 const btnPrimary = {
@@ -584,6 +584,40 @@ function PinterestBanner({ data }) {
 }
 
 /* ══════════════════════════════════════════════════
+   SECCIÓN PERSONALIZADA (creada desde /admin)
+══════════════════════════════════════════════════ */
+function CustomSection({ data }) {
+  const ref = useFadeUp()
+  if (!data) return null
+  const bg     = data.bgColor     || 'var(--bg)'
+  const ink    = data.textColor   || 'var(--ink)'
+  const accent = data.accentColor || '#C2185B'
+  return (
+    <section style={{background:bg,padding:'clamp(60px,8vw,100px) clamp(16px,6vw,80px)'}}>
+      <div ref={ref} className="fade-up" style={{maxWidth:1000,margin:'0 auto',textAlign:'center'}}>
+        {data.badge && (
+          <div style={{display:'inline-flex',padding:'6px 16px',borderRadius:'var(--r-pill)',background:`${accent}1a`,color:accent,fontSize:11,fontWeight:700,textTransform:'uppercase',letterSpacing:'.5px',marginBottom:16}}>{data.badge}</div>
+        )}
+        {data.title && (
+          <h2 style={{fontSize:'clamp(26px,3.5vw,44px)',fontWeight:900,letterSpacing:'-1px',color:ink,lineHeight:1.15,marginBottom:16}}>
+            {data.title}{data.accent && <> <span style={{color:accent}}>{data.accent}</span></>}
+          </h2>
+        )}
+        {data.image && (
+          <img src={data.image} alt={data.title||''} loading="lazy" style={{maxWidth:'100%',borderRadius:'var(--r)',margin:'8px auto 22px',boxShadow:'var(--sh-lg)',display:'block'}} />
+        )}
+        {data.text && (
+          <p style={{fontSize:16,lineHeight:1.8,color:ink,opacity:.92,maxWidth:640,margin:'0 auto 26px',whiteSpace:'pre-line'}}>{data.text}</p>
+        )}
+        {data.buttonText && data.buttonUrl && (
+          <a href={data.buttonUrl} target="_blank" rel="noreferrer" style={{...btnPrimary,background:accent,display:'inline-flex'}}>{data.buttonText}</a>
+        )}
+      </div>
+    </section>
+  )
+}
+
+/* ══════════════════════════════════════════════════
    SOBRE MÍ
 ══════════════════════════════════════════════════ */
 function About({ data, instagram }) {
@@ -1058,22 +1092,32 @@ export default function Site() {
     </div>
   )
 
-  const { hero, services, gallery, about, pricing, reviews, contact, theme, spotify, pinterest } = content
+  const { contact, theme } = content
   const wa = contact?.whatsapp
   const ig = contact?.instagram
+
+  // registro de secciones; el ORDEN lo define content.layout (editable en /admin)
+  const REGISTRY = {
+    hero:      () => <Hero data={content.hero} whatsapp={wa} />,
+    services:  () => <Services data={content.services} />,
+    spotify:   () => <SpotifyBanner data={content.spotify} />,
+    about:     () => <About data={content.about} instagram={ig} />,
+    pinterest: () => <PinterestBanner data={content.pinterest} />,
+    gallery:   () => <Gallery data={content.gallery} instagram={ig} />,
+    pricing:   () => <Pricing data={content.pricing} whatsapp={wa} />,
+    reviews:   () => <Reviews data={content.reviews} />,
+    contact:   () => <Contact data={content.contact} />,
+  }
+  const order = (Array.isArray(content.layout) && content.layout.length) ? content.layout : DEFAULT_LAYOUT
 
   return (
     <>
       <Navbar studioName={theme?.studioName} whatsapp={wa} instagram={ig} />
-      <Hero data={hero} whatsapp={wa} />
-      <Services data={services} />
-      <SpotifyBanner data={spotify} />
-      <About data={about} instagram={ig} />
-      <PinterestBanner data={pinterest} />
-      <Gallery data={gallery} instagram={ig} />
-      <Pricing data={pricing} whatsapp={wa} />
-      <Reviews data={reviews} />
-      <Contact data={contact} />
+      {order.map(key => {
+        if (REGISTRY[key]) return <Fragment key={key}>{REGISTRY[key]()}</Fragment>
+        if (key.startsWith('custom-') && content[key]) return <CustomSection key={key} data={content[key]} />
+        return null
+      })}
       <Footer theme={theme} instagram={ig} whatsapp={wa} />
       <WhatsAppFAB whatsapp={wa} config={contact?.floatWa} />
     </>

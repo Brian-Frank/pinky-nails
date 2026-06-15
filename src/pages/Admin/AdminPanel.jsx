@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { supabase, uploadImage } from '../../lib/supabase'
-import { useContent } from '../../context/ContentContext'
+import { useContent, DEFAULT_LAYOUT } from '../../context/ContentContext'
 
 /* ── tiny helpers ──────────────────────────────────────────── */
 const cls = (...a) => a.filter(Boolean).join(' ')
@@ -860,6 +860,139 @@ function PinterestEditor() {
 }
 
 /* ═══════════════════════════════════════════════════════════
+   LAYOUT / SECCIONES (reordenar + secciones personalizadas)
+═══════════════════════════════════════════════════════════ */
+const SECTION_LABELS = {
+  hero:'🏠 Inicio', services:'💅 Servicios', spotify:'🎵 Spotify',
+  about:'🌸 Sobre mí', pinterest:'📌 Pinterest', gallery:'📸 Galería',
+  pricing:'💰 Precios', reviews:'⭐ Reseñas', contact:'📞 Contacto',
+}
+
+function LayoutEditor() {
+  const { content, updateSection } = useContent()
+  const [layout, setLayout] = useState(() =>
+    (Array.isArray(content.layout) && content.layout.length) ? [...content.layout] : [...DEFAULT_LAYOUT])
+  const [custom, setCustom] = useState(() => {
+    const c = {}
+    Object.keys(content).forEach(k => { if (k.startsWith('custom-')) c[k] = { ...content[k] } })
+    return c
+  })
+  const [editing, setEditing] = useState(null)
+  const [saving, setSaving] = useState(false)
+
+  function move(i, dir) {
+    const j = i + dir
+    if (j < 0 || j >= layout.length) return
+    const nl = [...layout]
+    ;[nl[i], nl[j]] = [nl[j], nl[i]]
+    setLayout(nl)
+  }
+  function addCustom() {
+    const id = 'custom-' + Math.random().toString(36).slice(2, 8)
+    setCustom({ ...custom, [id]: {
+      badge:'', title:'Nueva sección', accent:'', text:'Escribí acá el contenido de tu nueva sección.',
+      image:'', buttonText:'', buttonUrl:'', bgColor:'#FFF0F5', textColor:'#2D1B2E', accentColor:'#C2185B',
+    } })
+    setLayout([...layout, id])
+    setEditing(id)
+  }
+  function removeCustom(id) {
+    if (!confirm('¿Borrar esta sección personalizada?')) return
+    setLayout(layout.filter(k => k !== id))
+    const c = { ...custom }; delete c[id]; setCustom(c)
+    if (editing === id) setEditing(null)
+  }
+  function setField(id, f, v) { setCustom({ ...custom, [id]: { ...custom[id], [f]: v } }) }
+
+  async function save() {
+    setSaving(true)
+    try {
+      for (const id of layout) {
+        if (id.startsWith('custom-') && custom[id]) await updateSection(id, custom[id])
+      }
+      await updateSection('layout', layout)
+      alert('¡Orden y secciones guardados!')
+    } catch (e) { alert(e.message) }
+    setSaving(false)
+  }
+
+  function labelFor(key) {
+    if (SECTION_LABELS[key]) return SECTION_LABELS[key]
+    if (key.startsWith('custom-')) return '🧩 ' + (custom[key]?.title || 'Sección personalizada')
+    return key
+  }
+  function colorInput(label, id, key, ph) {
+    return (
+      <div className="a-field"><label>{label}</label>
+        <div style={{display:'flex',gap:8,alignItems:'center'}}>
+          <input type="color" value={custom[id][key] || ph} onChange={e=>setField(id,key,e.target.value)}
+            style={{width:48,height:40,border:'none',cursor:'pointer',background:'none'}} />
+          <input value={custom[id][key] || ''} onChange={e=>setField(id,key,e.target.value)} style={{flex:1}} placeholder={ph} />
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="a-section">
+      <h2 className="a-section-title">🧩 Secciones y orden</h2>
+      <p style={{color:'var(--text-lt)',fontSize:13,marginBottom:16,lineHeight:1.6}}>
+        Cambiá el orden con ↑/↓ — se refleja igual en la página. Podés crear secciones nuevas personalizadas y editar sus textos, colores y botón.
+      </p>
+
+      <div style={{display:'flex',flexDirection:'column',gap:8}}>
+        {layout.map((key, i) => {
+          const isCustom = key.startsWith('custom-')
+          return (
+            <div key={key} style={{border:'1.5px solid var(--border)',borderRadius:10,overflow:'hidden'}}>
+              <div style={{display:'flex',alignItems:'center',gap:8,padding:'10px 12px',background:'#fff'}}>
+                <span style={{fontWeight:700,color:'var(--text-lt)',minWidth:22,textAlign:'center'}}>{i+1}</span>
+                <span style={{flex:1,fontWeight:600,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{labelFor(key)}</span>
+                {isCustom && <button className="a-btn-outline" style={{padding:'5px 12px',fontSize:12}} onClick={()=>setEditing(editing===key?null:key)}>{editing===key?'Cerrar':'✎ Editar'}</button>}
+                <button className="a-btn-outline" style={{padding:'5px 11px'}} disabled={i===0} onClick={()=>move(i,-1)}>↑</button>
+                <button className="a-btn-outline" style={{padding:'5px 11px'}} disabled={i===layout.length-1} onClick={()=>move(i,1)}>↓</button>
+                {isCustom && <button className="a-btn-del" onClick={()=>removeCustom(key)}>✕</button>}
+              </div>
+              {isCustom && editing===key && (
+                <div style={{padding:'14px',borderTop:'1px solid var(--border)',background:'var(--bg)',display:'flex',flexDirection:'column',gap:12}}>
+                  <div className="a-field"><label>Insignia / badge (opcional)</label>
+                    <input value={custom[key].badge||''} onChange={e=>setField(key,'badge',e.target.value)} placeholder="✨ Novedad" /></div>
+                  <div className="a-row">
+                    <div className="a-field"><label>Título</label>
+                      <input value={custom[key].title||''} onChange={e=>setField(key,'title',e.target.value)} /></div>
+                    <div className="a-field"><label>Palabra destacada (color acento)</label>
+                      <input value={custom[key].accent||''} onChange={e=>setField(key,'accent',e.target.value)} placeholder="opcional" /></div>
+                  </div>
+                  <div className="a-field"><label>Texto</label>
+                    <textarea rows={3} value={custom[key].text||''} onChange={e=>setField(key,'text',e.target.value)} /></div>
+                  <div className="a-field"><label>Imagen (opcional)</label>
+                    <ImgPicker value={custom[key].image} onChange={url=>setField(key,'image',url)} folder="custom" label="Subir imagen" /></div>
+                  <div className="a-row">
+                    <div className="a-field"><label>Texto del botón (opcional)</label>
+                      <input value={custom[key].buttonText||''} onChange={e=>setField(key,'buttonText',e.target.value)} placeholder="Reservar →" /></div>
+                    <div className="a-field"><label>Link del botón</label>
+                      <input value={custom[key].buttonUrl||''} onChange={e=>setField(key,'buttonUrl',e.target.value)} placeholder="https://..." /></div>
+                  </div>
+                  <div className="a-row">
+                    {colorInput('Fondo', key, 'bgColor', '#FFF0F5')}
+                    {colorInput('Texto', key, 'textColor', '#2D1B2E')}
+                    {colorInput('Acento', key, 'accentColor', '#C2185B')}
+                  </div>
+                </div>
+              )}
+            </div>
+          )
+        })}
+      </div>
+
+      <button className="a-btn-add" onClick={addCustom} style={{marginTop:14}}>+ Agregar sección personalizada</button>
+
+      <div style={{marginTop:22}}><SaveBtn saving={saving} onClick={save} /></div>
+    </div>
+  )
+}
+
+/* ═══════════════════════════════════════════════════════════
    MAIN ADMIN PANEL
 ═══════════════════════════════════════════════════════════ */
 const TABS = [
@@ -873,6 +1006,7 @@ const TABS = [
   { id:'appearance', label:'🎨 Apariencia' },
   { id:'spotify',    label:'🎵 Spotify' },
   { id:'pinterest',  label:'📌 Pinterest' },
+  { id:'layout',     label:'🧩 Secciones' },
 ]
 
 export default function AdminPanel() {
@@ -911,6 +1045,7 @@ export default function AdminPanel() {
     appearance: <AppearanceEditor />,
     spotify:    <SpotifyEditor />,
     pinterest:  <PinterestEditor />,
+    layout:     <LayoutEditor />,
   }
 
   return (

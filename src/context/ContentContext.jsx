@@ -1,5 +1,8 @@
 import { createContext, useContext, useEffect, useState, useCallback } from 'react'
 
+/* Orden por defecto de las secciones de la pagina (editable en /admin) */
+export const DEFAULT_LAYOUT = ['hero','services','spotify','about','pinterest','gallery','pricing','reviews','contact']
+
 /* ── Default content (used when DB is empty) ───────────────── */
 export const DEFAULT_CONTENT = {
   hero: {
@@ -117,6 +120,7 @@ export const DEFAULT_CONTENT = {
     accentColor: '#E60023',
     textColor:   '#2D1B2E',
   },
+  layout: DEFAULT_LAYOUT,
 }
 
 const SECTIONS = Object.keys(DEFAULT_CONTENT)
@@ -133,7 +137,12 @@ export function ContentProvider({ children }) {
       .then(({ data }) => {
         if (data && data.length > 0) {
           const merged = { ...DEFAULT_CONTENT }
-          data.forEach(row => { if (merged[row.section] !== undefined) merged[row.section] = row.data })
+          data.forEach(row => {
+            // secciones conocidas + secciones personalizadas (custom-*)
+            if (merged[row.section] !== undefined || row.section.startsWith('custom-')) {
+              merged[row.section] = row.data
+            }
+          })
           setContent(merged)
         }
       })
