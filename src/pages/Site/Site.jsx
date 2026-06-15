@@ -540,6 +540,50 @@ function SpotifyBanner({ data }) {
 }
 
 /* ══════════════════════════════════════════════════
+   BANNER PINTEREST (mismo formato que Spotify)
+══════════════════════════════════════════════════ */
+function PinterestBanner({ data }) {
+  if (!data?.url || !data?.text) return null
+  const bg     = data.bgColor     || '#FFF0F5'
+  const accent = data.accentColor || '#E60023'
+  const ink    = data.textColor   || '#2D1B2E'
+  const pinSvg = (size) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill={accent} style={{flexShrink:0,filter:`drop-shadow(0 2px 8px ${accent}55)`}}>
+      <path d="M12 0C5.373 0 0 5.372 0 12c0 4.873 2.873 9.064 7.012 10.945-.097-.93-.184-2.357.038-3.374.2-.92 1.292-5.857 1.292-5.857s-.33-.66-.33-1.633c0-1.53.888-2.673 1.992-2.673.94 0 1.392.705 1.392 1.55 0 .944-.6 2.357-.91 3.667-.26 1.096.55 1.99 1.63 1.99 1.957 0 3.46-2.063 3.46-5.04 0-2.635-1.893-4.477-4.597-4.477-3.13 0-4.967 2.348-4.967 4.775 0 .945.364 1.96.82 2.51.09.11.103.207.077.318-.084.35-.27 1.096-.306 1.25-.048.2-.157.244-.362.147-1.35-.628-2.193-2.602-2.193-4.187 0-3.408 2.476-6.54 7.14-6.54 3.75 0 6.664 2.672 6.664 6.243 0 3.725-2.35 6.722-5.61 6.722-1.095 0-2.126-.57-2.478-1.243l-.674 2.572c-.244.94-.904 2.117-1.346 2.835C9.864 23.815 10.913 24 12 24c6.627 0 12-5.373 12-12C24 5.372 18.627 0 12 0z"/>
+    </svg>
+  )
+  return (
+    <section style={{background:bg,borderTop:`1px solid ${accent}22`,padding:'clamp(32px,5vw,56px) clamp(16px,6vw,80px)'}}>
+      <style>{`
+        .pin-inner{display:flex;flex-direction:column;align-items:center;text-align:center;gap:20px;max-width:800px;margin:0 auto;}
+        .pin-top{display:flex;align-items:center;justify-content:center;gap:16px;}
+        .pin-text{font-size:17px;font-weight:700;line-height:1.5;font-family:var(--font);}
+        .pin-btn{display:inline-flex;align-items:center;gap:8px;padding:13px 28px;border-radius:var(--r-pill);color:#fff;font-size:14px;font-weight:800;text-decoration:none;white-space:nowrap;transition:opacity .15s,transform .1s;font-family:var(--font);box-shadow:0 4px 20px rgba(0,0,0,.15);}
+        .pin-btn:hover{opacity:.88;transform:translateY(-2px);}
+        .pin-logo-desktop{display:block;}
+        .pin-logo-mobile{display:none;}
+        @media(max-width:640px){
+          .pin-top{flex-direction:column;gap:8px;}
+          .pin-text{font-size:15px;}
+          .pin-logo-desktop{display:none;}
+          .pin-logo-mobile{display:block;}
+        }
+      `}</style>
+      <div className="pin-inner">
+        <div className="pin-top">
+          <span className="pin-logo-desktop">{pinSvg(48)}</span>
+          <span className="pin-logo-mobile">{pinSvg(30)}</span>
+          <span className="pin-text" style={{color:ink}}>{data.text}</span>
+        </div>
+        <a href={data.url} target="_blank" rel="noreferrer" className="pin-btn" style={{background:accent}}>
+          Ver ideas en Pinterest →
+        </a>
+      </div>
+    </section>
+  )
+}
+
+/* ══════════════════════════════════════════════════
    SOBRE MÍ
 ══════════════════════════════════════════════════ */
 function About({ data, instagram }) {
@@ -1014,7 +1058,7 @@ export default function Site() {
     </div>
   )
 
-  const { hero, services, gallery, about, pricing, reviews, contact, theme, spotify } = content
+  const { hero, services, gallery, about, pricing, reviews, contact, theme, spotify, pinterest } = content
   const wa = contact?.whatsapp
   const ig = contact?.instagram
 
@@ -1025,6 +1069,7 @@ export default function Site() {
       <Services data={services} />
       <SpotifyBanner data={spotify} />
       <About data={about} instagram={ig} />
+      <PinterestBanner data={pinterest} />
       <Gallery data={gallery} instagram={ig} />
       <Pricing data={pricing} whatsapp={wa} />
       <Reviews data={reviews} />

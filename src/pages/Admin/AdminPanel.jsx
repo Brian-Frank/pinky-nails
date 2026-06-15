@@ -791,6 +791,75 @@ function SpotifyEditor() {
 }
 
 /* ═══════════════════════════════════════════════════════════
+   PINTEREST EDITOR
+═══════════════════════════════════════════════════════════ */
+function PinterestEditor() {
+  const { content, updateSection } = useContent()
+  const [d, setD] = useState({
+    bgColor:'#FFF0F5', accentColor:'#E60023', textColor:'#2D1B2E',
+    ...(content.pinterest || {}),
+  })
+  const [saving, setSaving] = useState(false)
+
+  async function save() {
+    setSaving(true)
+    try { await updateSection('pinterest', d) } catch(e) { alert(e.message) }
+    setSaving(false)
+  }
+
+  function colorField(label, key, placeholder) {
+    return (
+      <div className="a-field">
+        <label>{label}</label>
+        <div style={{display:'flex',gap:8,alignItems:'center'}}>
+          <input type="color" value={d[key]} onChange={e=>setD({...d,[key]:e.target.value})}
+            style={{width:48,height:40,border:'none',cursor:'pointer',background:'none'}} />
+          <input value={d[key]} onChange={e=>setD({...d,[key]:e.target.value})}
+            style={{flex:1}} placeholder={placeholder} />
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="a-section">
+      <h2 className="a-section-title">📌 Pinterest Banner</h2>
+
+      <div className="a-field">
+        <label>Frase del banner</label>
+        <input value={d.text} onChange={e=>setD({...d,text:e.target.value})} placeholder="¿No sabés qué diseño hacerte? Acá te dejo ideas de Pinterest 📌" />
+      </div>
+
+      <div className="a-field">
+        <label>Link de Pinterest (tablero o perfil)</label>
+        <input value={d.url} onChange={e=>setD({...d,url:e.target.value})} placeholder="https://pin.it/..." />
+      </div>
+
+      <div className="a-row">
+        {colorField('Color de fondo',  'bgColor',     '#FFF0F5')}
+        {colorField('Color de acento', 'accentColor', '#E60023')}
+        {colorField('Color del texto', 'textColor',   '#2D1B2E')}
+      </div>
+
+      {/* Preview en tiempo real */}
+      <div style={{background:d.bgColor,borderRadius:12,padding:'20px 24px',border:`2px solid ${d.accentColor}33`,display:'flex',alignItems:'center',justifyContent:'space-between',gap:16,marginTop:8,flexWrap:'wrap'}}>
+        <div style={{display:'flex',alignItems:'center',gap:12}}>
+          <svg width="26" height="26" viewBox="0 0 24 24" fill={d.accentColor} style={{flexShrink:0}}>
+            <path d="M12 0C5.373 0 0 5.372 0 12c0 4.873 2.873 9.064 7.012 10.945-.097-.93-.184-2.357.038-3.374.2-.92 1.292-5.857 1.292-5.857s-.33-.66-.33-1.633c0-1.53.888-2.673 1.992-2.673.94 0 1.392.705 1.392 1.55 0 .944-.6 2.357-.91 3.667-.26 1.096.55 1.99 1.63 1.99 1.957 0 3.46-2.063 3.46-5.04 0-2.635-1.893-4.477-4.597-4.477-3.13 0-4.967 2.348-4.967 4.775 0 .945.364 1.96.82 2.51.09.11.103.207.077.318-.084.35-.27 1.096-.306 1.25-.048.2-.157.244-.362.147-1.35-.628-2.193-2.602-2.193-4.187 0-3.408 2.476-6.54 7.14-6.54 3.75 0 6.664 2.672 6.664 6.243 0 3.725-2.35 6.722-5.61 6.722-1.095 0-2.126-.57-2.478-1.243l-.674 2.572c-.244.94-.904 2.117-1.346 2.835C9.864 23.815 10.913 24 12 24c6.627 0 12-5.373 12-12C24 5.372 18.627 0 12 0z"/>
+          </svg>
+          <span style={{fontSize:14,fontWeight:700,color:d.textColor}}>{d.text || 'Frase del banner...'}</span>
+        </div>
+        <div style={{background:d.accentColor,color:'#fff',borderRadius:99,padding:'8px 18px',fontSize:12,fontWeight:800,flexShrink:0}}>
+          Ver ideas en Pinterest →
+        </div>
+      </div>
+
+      <SaveBtn saving={saving} onClick={save} />
+    </div>
+  )
+}
+
+/* ═══════════════════════════════════════════════════════════
    MAIN ADMIN PANEL
 ═══════════════════════════════════════════════════════════ */
 const TABS = [
@@ -803,6 +872,7 @@ const TABS = [
   { id:'contact',    label:'📞 Contacto' },
   { id:'appearance', label:'🎨 Apariencia' },
   { id:'spotify',    label:'🎵 Spotify' },
+  { id:'pinterest',  label:'📌 Pinterest' },
 ]
 
 export default function AdminPanel() {
@@ -840,6 +910,7 @@ export default function AdminPanel() {
     contact:    <ContactEditor />,
     appearance: <AppearanceEditor />,
     spotify:    <SpotifyEditor />,
+    pinterest:  <PinterestEditor />,
   }
 
   return (

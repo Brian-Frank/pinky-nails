@@ -110,6 +110,13 @@ export const DEFAULT_CONTENT = {
     accentColor: '#C2185B',
     textColor:   '#2D1B2E',
   },
+  pinterest: {
+    text: '¿No sabés qué diseño hacerte? Acá te dejo algunas ideas de Pinterest 📌',
+    url: 'https://pin.it/1oIFSh7lb',
+    bgColor:     '#FFF0F5',
+    accentColor: '#E60023',
+    textColor:   '#2D1B2E',
+  },
 }
 
 const SECTIONS = Object.keys(DEFAULT_CONTENT)
