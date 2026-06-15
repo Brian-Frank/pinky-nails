@@ -10,14 +10,16 @@ export default async function handler(req, res) {
     return res.status(401).json({ error: 'No autorizado' })
   }
 
-  // parse body
-  let body = {}
-  try {
-    let raw = ''
-    for await (const chunk of req) raw += chunk
-    body = JSON.parse(raw)
-  } catch {
-    return res.status(400).json({ error: 'Bad request' })
+  // parse body (algunos runtimes ya lo parsean en req.body; sino leer el stream)
+  let body = req.body
+  if (!body || typeof body !== 'object') {
+    try {
+      let raw = ''
+      for await (const chunk of req) raw += chunk
+      body = raw ? JSON.parse(raw) : {}
+    } catch {
+      return res.status(400).json({ error: 'Bad request' })
+    }
   }
 
   const { section, data } = body
