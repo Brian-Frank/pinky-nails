@@ -4,7 +4,7 @@ import { useContent } from '../../context/ContentContext'
 /* ─── Shared button styles ─── */
 const btnPrimary = {
   display:'inline-flex',alignItems:'center',justifyContent:'center',gap:'8px',
-  padding:'13px 28px',borderRadius:'var(--r-pill)',border:'none',cursor:'pointer',
+  padding:'13px 28px',borderRadius:'var(--r-pill)',border:'2px solid transparent',cursor:'pointer',
   background:'var(--cp)',
   color:'#fff',fontSize:'14px',fontWeight:700,
   boxShadow:'var(--sh-btn)',transition:'opacity .15s,transform .1s',
