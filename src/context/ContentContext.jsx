@@ -12,6 +12,7 @@ export const DEFAULT_CONTENT = {
       { num: '∞',    label: 'Diseños únicos' },
     ],
     floatCard1: 'Turnos disponibles',
+    floatCard1Color: '#22c55e',
     image: 'https://images.unsplash.com/photo-1604654894610-df63bc536371?auto=format&fit=crop&w=800&q=80',
   },
   services: [

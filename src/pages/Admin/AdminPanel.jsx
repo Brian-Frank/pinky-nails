@@ -206,8 +206,18 @@ function HeroEditor() {
       <div className="a-field"><label>Subtítulo</label>
         <textarea rows={3} value={d.subtitle} onChange={e=>setD({...d,subtitle:e.target.value})} /></div>
 
-      <div className="a-field"><label>Texto tarjeta flotante</label>
-        <input value={d.floatCard1} onChange={e=>setD({...d,floatCard1:e.target.value})} /></div>
+      <div className="a-row">
+        <div className="a-field"><label>Texto tarjeta flotante</label>
+          <input value={d.floatCard1} onChange={e=>setD({...d,floatCard1:e.target.value})} /></div>
+        <div className="a-field"><label>Color del círculo (verde=disponible, rojo=lleno/vacaciones)</label>
+          <div style={{display:'flex',gap:8,alignItems:'center'}}>
+            <input type="color" value={d.floatCard1Color || '#22c55e'} onChange={e=>setD({...d,floatCard1Color:e.target.value})}
+              style={{width:48,height:40,border:'none',cursor:'pointer',background:'none'}} />
+            <input value={d.floatCard1Color || '#22c55e'} onChange={e=>setD({...d,floatCard1Color:e.target.value})}
+              style={{flex:1}} placeholder="#22c55e" />
+          </div>
+        </div>
+      </div>
 
       <div className="a-field">
         <label>Imagen principal</label>

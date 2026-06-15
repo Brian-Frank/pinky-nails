@@ -314,7 +314,7 @@ function Hero({ data, whatsapp }) {
             <img src={data.image} alt="Pinky Nail Studio" style={{width:'100%',height:'100%',objectFit:'cover'}} />
           </div>
           <div className="hero-float-card" style={{position:'absolute',bottom:-24,left:-28,background:'var(--card)',borderRadius:'var(--r)',padding:'16px 20px',boxShadow:'var(--sh-lg)',border:'1.5px solid var(--border)',fontSize:13,fontWeight:700,color:'var(--ink)',display:'flex',alignItems:'center',gap:10}}>
-            <div style={{width:8,height:8,borderRadius:'50%',background:'#22c55e',boxShadow:'0 0 0 3px rgba(34,197,94,.2)'}} />
+            <div style={{width:8,height:8,borderRadius:'50%',background:data.floatCard1Color||'#22c55e',boxShadow:`0 0 0 3px ${(data.floatCard1Color||'#22c55e')}33`}} />
             {data.floatCard1}
           </div>
         </div>
@@ -632,11 +632,11 @@ function Gallery({ data, instagram }) {
         </div>
         <div style={{display:'flex',gap:14,justifyContent:'center',flexWrap:'wrap',marginTop:36}}>
           {hasMore && (
-            <button ref={btnRef} onClick={toggleExpand} style={{...btnPrimary}}>
+            <button ref={btnRef} onClick={toggleExpand} style={{...btnPrimary,minWidth:240}}>
               {expanded ? '↑ Ver menos' : `Ver más fotos (+${photos.length-INITIAL})`}
             </button>
           )}
-          <a href={`https://www.instagram.com/${ig}/`} target="_blank" rel="noreferrer" style={{...btnOutline,display:'inline-flex'}}>Ver más en Instagram →</a>
+          <a href={`https://www.instagram.com/${ig}/`} target="_blank" rel="noreferrer" style={{...btnOutline,display:'inline-flex',minWidth:240}}>Ver más en Instagram →</a>
         </div>
       </div>
       {lb !== null && <Lightbox items={photos} startIdx={lb} onClose={()=>setLb(null)} />}
